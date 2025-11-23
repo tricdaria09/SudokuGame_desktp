@@ -1,356 +1,344 @@
 package com.sudokugame.cafe;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.*;
-import java.util.Timer;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.Timer;
 
 public class CafeManager {
     private int money;
-    private Map<String, CafeItem> items;
-    private Map<String, Upgrade> upgrades;
-    private int totalEarnings;
+    private int totalIncome;
+    private int gamesPlayed;
+    private int gamesWon;
+    private int cafeLevel;
     private int customers;
+    private int satisfaction;
     private Timer incomeTimer;
+    private Timer customerTimer;
+
+    // 🏪 SISTEM DE UPGRADE-URI AVANSAT
+    private Map<String, Integer> upgrades;
+    private Map<String, Integer> upgradeCosts;
+    private List<CafeObject> cafeObjects;
+    private List<Customer> customersList;
+    private Timer customerSpawnTimer;
+    private int maxCustomers;
 
     public CafeManager() {
-        this.money = 150; // Bani de start
-        this.totalEarnings = 0;
-        this.customers = 10;
-        this.items = new HashMap<>();
-        this.upgrades = new HashMap<>();
+        this.money = 500; // Mai mulți bani de start
+        this.totalIncome = 0;
+        this.gamesPlayed = 0;
+        this.gamesWon = 0;
+        this.cafeLevel = 1;
+        this.customers = 5;
+        this.satisfaction = 70;
+        this.customersList = new ArrayList<>();
+        this.maxCustomers = 8;
 
-        initializeItems();
         initializeUpgrades();
-        startPassiveIncome();
+        initializeCafeObjects();
+        startPassiveSystems();
+        startCustomerSystem();
     }
 
-    private void initializeItems() {
-        items.put("coffee", new CafeItem("Cafea Premium", "coffee", 100,
-                "Crește veniturile pasive", "☕"));
-        items.put("pastry", new CafeItem("Patiserie Artizanală", "pastry", 150,
-                "Crește bonus-ul la joc", "🍰"));
-        items.put("decor", new CafeItem("Decor Vintage", "decor", 200,
-                "Atrage mai mulți clienți", "🎨"));
-        items.put("music", new CafeItem("Sistem Audio", "music", 120,
-                "Îmbunătățește experiența", "🎵"));
-        items.put("lighting", new CafeItem("Iluminat Ambient", "lighting", 180,
-                "Crește nivelul de comfort", "💡"));
-    }
 
     private void initializeUpgrades() {
-        upgrades.put("coffee", new Upgrade("Cafea de Specialitate", "coffee", 100, 10));
-        upgrades.put("pastry", new Upgrade("Brusc Artizanal", "pastry", 150, 8));
-        upgrades.put("decor", new Upgrade("Design Interior", "decor", 200, 5));
-        upgrades.put("music", new Upgrade("Playlist Premium", "music", 120, 6));
-        upgrades.put("lighting", new Upgrade("Iluminat LED", "lighting", 180, 7));
+        upgrades = new HashMap<>();
+        upgradeCosts = new HashMap<>();
+
+        // ☕ UPGRADE-URI DE BAZĂ
+        upgrades.put("coffee_quality", 1);
+        upgrades.put("pastry_variety", 1);
+        upgrades.put("service_speed", 1);
+        upgrades.put("decor", 1);
+        upgrades.put("marketing", 1);
+
+        upgradeCosts.put("coffee_quality", 150);
+        upgradeCosts.put("pastry_variety", 120);
+        upgradeCosts.put("service_speed", 100);
+        upgradeCosts.put("decor", 200);
+        upgradeCosts.put("marketing", 180);
     }
 
-    private void startPassiveIncome() {
-        incomeTimer = new Timer();
-        incomeTimer.scheduleAtFixedRate(new TimerTask() {
+    private void initializeCafeObjects() {
+        cafeObjects = new ArrayList<>();
+        // Obiectele vor fi adăugate în CafeScene
+    }
+
+    private void startPassiveSystems() {
+        // 💰 SISTEM DE VENIT PASIV
+        incomeTimer = new Timer(10000, new ActionListener() {
             @Override
-            public void run() {
+            public void actionPerformed(ActionEvent e) {
                 generatePassiveIncome();
             }
-        }, 60000, 60000); // La fiecare 60 de secunde (1 minut)
+        });
+        incomeTimer.start();
+
+        // 👥 SISTEM DE CLIENTI
+        customerTimer = new Timer(15000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateCustomers();
+            }
+        });
+        customerTimer.start();
+    }
+
+    private void startCustomerSystem() {
+        // 👥 SPAWN CLIENTI LA INTERVALE
+        customerSpawnTimer = new Timer(8000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                spawnCustomer();
+            }
+        });
+        customerSpawnTimer.start();
+
+        // 🔄 UPDATE CLIENTI EXISTENTI
+        Timer customerUpdateTimer = new Timer(100, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateCustomersList();
+            }
+        });
+        customerUpdateTimer.start();
     }
 
     private void generatePassiveIncome() {
-        int hourlyIncome = calculateHourlyIncome();
-        int income = hourlyIncome / 60; // Income per minute
+        int hourlyIncome = getHourlyIncome();
+        int income = hourlyIncome / 360; // Venit la fiecare 10 secunde
+
         money += income;
-        totalEarnings += income;
-        customers += getCustomersPerMinute();
+        totalIncome += income;
 
-        // Actualizează UI-ul dacă este deschis
-        SwingUtilities.invokeLater(() -> {
-            // Aici poți actualiza UI-ul dacă este deschis
-        });
+        // 🎯 BONUS DE SATISFACTIE
+        if (satisfaction > 80) {
+            money += (int)(income * 0.2); // +20% bonus pentru satisfacție mare
+        }
     }
 
-    public void showCafe() {
-        JFrame cafeFrame = new JFrame("☕ Cafenea Ta - Manager");
-        cafeFrame.setSize(800, 900);
-        cafeFrame.setLocationRelativeTo(null);
-        cafeFrame.setResizable(false);
+    private void updateCustomers() {
+        int maxCustomers = getMaxCustomers();
+        int change = calculateCustomerChange();
 
-        JTabbedPane tabbedPane = new JTabbedPane();
+        customers += change;
+        customers = Math.max(3, Math.min(maxCustomers, customers)); // Limită între 3 și max
 
-        // Tab-ul pentru Upgrade-uri
-        tabbedPane.addTab("🛠️ Upgrade-uri", createUpgradesTab());
-
-        // Tab-ul pentru Statistici
-        tabbedPane.addTab("📊 Statistici", createStatsTab());
-
-        // Tab-ul pentru Achievements
-        tabbedPane.addTab("🏆 Achievements", createAchievementsTab());
-
-        cafeFrame.add(tabbedPane);
-        cafeFrame.setVisible(true);
+        // 📈 ACTUALIZEAZĂ SATISFACTIA
+        updateSatisfaction();
     }
 
-    private JPanel createUpgradesTab() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(245, 222, 179));
+    private void spawnCustomer() {
+        if (customersList.size() < maxCustomers) {
+            Random rand = new Random();
+            if (rand.nextInt(100) < getSpawnChance()) {
+                Customer newCustomer = new Customer(1000, 300 + rand.nextInt(200));
+                customersList.add(newCustomer);
+            }
+        }
+    }
 
-        // Header
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(new Color(139, 69, 19));
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
+    private void updateCustomersList() {
+        // 🔄 UPDATE TOȚI CLIENTII
+        for (int i = customersList.size() - 1; i >= 0; i--) {
+            Customer customer = customersList.get(i);
+            customer.update();
 
-        JLabel moneyLabel = new JLabel("💰 " + money + " coins");
-        moneyLabel.setForeground(Color.WHITE);
-        moneyLabel.setFont(new Font("Arial", Font.BOLD, 20));
+            if (customer.shouldRemove()) {
+                // 💰 PRIMESTE BANI DACA CLIENTUL A PLECAT FERICIT
+                if (!customer.isAngry()) {
+                    int spending = customer.calculateSpending();
+                    money += spending;
+                    totalIncome += spending;
+                }
+                customersList.remove(i);
+            }
+        }
+    }
 
-        JLabel incomeLabel = new JLabel("📈 " + calculateHourlyIncome() + " coins/h");
-        incomeLabel.setForeground(Color.WHITE);
-        incomeLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+    private int calculateCustomerChange() {
+        Random rand = new Random();
+        int baseChange = rand.nextInt(3) - 1; // -1, 0, sau +1
 
-        headerPanel.add(moneyLabel, BorderLayout.WEST);
-        headerPanel.add(incomeLabel, BorderLayout.EAST);
+        // 🎯 FACTORI CARE AFECTEAZĂ CLIENTII
+        double satisfactionEffect = (satisfaction - 50) / 100.0; // -0.5 to +0.5
+        double marketingEffect = upgrades.get("marketing") * 0.1; // +0.1 per level
 
-        // Content - Upgrade cards
-        JPanel contentPanel = new JPanel(new GridLayout(0, 1, 10, 10));
-        contentPanel.setBackground(new Color(245, 222, 179));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        return baseChange + (int)(satisfactionEffect * 2) + (int)marketingEffect;
+    }
 
-        for (Upgrade upgrade : upgrades.values()) {
-            contentPanel.add(createUpgradeCard(upgrade));
+    private void updateSatisfaction() {
+        Random rand = new Random();
+        int change = rand.nextInt(5) - 2; // -2 to +2
+
+        // 🎯 FACTORI CARE AFECTEAZĂ SATISFACTIA
+        int serviceBonus = upgrades.get("service_speed") * 3;
+        int decorBonus = upgrades.get("decor") * 2;
+
+        satisfaction += change + (serviceBonus + decorBonus) / 10;
+        satisfaction = Math.max(30, Math.min(100, satisfaction)); // Limită 30-100%
+    }
+
+    private int getSpawnChance() {
+        // 🎯 SANSE MAI MARI CU MARKETING BUN
+        int baseChance = 30;
+        int marketingBonus = upgrades.get("marketing") * 5;
+        int satisfactionBonus = satisfaction / 10;
+
+        return baseChance + marketingBonus + satisfactionBonus;
+    }
+
+    // 🎮 METODE PENTRU JOCUL SUDOKU
+    public void addGameResult(boolean won, int baseReward) {
+        gamesPlayed++;
+        if (won) {
+            gamesWon++;
+
+            // 🎯 CALCULEAZĂ REWARD CU BONUSURI
+            double qualityBonus = 1.0 + (upgrades.get("coffee_quality") * 0.1);
+            double pastryBonus = 1.0 + (upgrades.get("pastry_variety") * 0.08);
+            double satisfactionBonus = 1.0 + ((satisfaction - 50) * 0.01);
+
+            int totalReward = (int)(baseReward * qualityBonus * pastryBonus * satisfactionBonus);
+            money += totalReward;
+
+            // 🎉 BONUS CLIENTI PENTRU VICTORIE
+            customers += 2;
+            satisfaction = Math.min(100, satisfaction + 10);
         }
 
-        JScrollPane scrollPane = new JScrollPane(contentPanel);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-
-        panel.add(headerPanel, BorderLayout.NORTH);
-        panel.add(scrollPane, BorderLayout.CENTER);
-
-        return panel;
+        // 📈 ACTUALIZEAZĂ NIVELUL CAFENELEI
+        updateCafeLevel();
     }
 
-    private JPanel createUpgradeCard(Upgrade upgrade) {
-        JPanel card = new JPanel(new BorderLayout(15, 15));
-        card.setBackground(Color.WHITE);
-        card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(210, 180, 140), 2),
-                BorderFactory.createEmptyBorder(20, 20, 20, 20)
-        ));
-
-        // Left side - Info
-        JPanel infoPanel = new JPanel(new BorderLayout(10, 10));
-        infoPanel.setBackground(Color.WHITE);
-
-        JLabel nameLabel = new JLabel(upgrade.getName() + " - Nivel " + upgrade.getCurrentLevel());
-        nameLabel.setFont(new Font("Arial", Font.BOLD, 18));
-
-        JLabel descLabel = new JLabel(upgrade.getCurrentDescription());
-        descLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        descLabel.setForeground(Color.GRAY);
-
-        // Progress bar
-        JProgressBar progressBar = new JProgressBar(0, upgrade.getMaxLevel());
-        progressBar.setValue(upgrade.getCurrentLevel());
-        progressBar.setString(upgrade.getProgress());
-        progressBar.setStringPainted(true);
-        progressBar.setForeground(getUpgradeColor(upgrade.getCategory()));
-
-        JPanel textPanel = new JPanel(new GridLayout(3, 1, 5, 5));
-        textPanel.setBackground(Color.WHITE);
-        textPanel.add(nameLabel);
-        textPanel.add(descLabel);
-        textPanel.add(progressBar);
-
-        infoPanel.add(textPanel, BorderLayout.CENTER);
-
-        // Right side - Upgrade button
-        int cost = upgrade.getUpgradeCost();
-        JButton upgradeButton = new JButton("<html><center>Upgrade<br>" + cost + " coins</center></html>");
-        upgradeButton.setFont(new Font("Arial", Font.BOLD, 14));
-        upgradeButton.setBackground(canAfford(cost) ? new Color(139, 69, 19) : Color.GRAY);
-        upgradeButton.setForeground(Color.WHITE);
-        upgradeButton.setPreferredSize(new Dimension(120, 60));
-        upgradeButton.setEnabled(upgrade.canUpgrade() && canAfford(cost));
-        upgradeButton.addActionListener(e -> purchaseUpgrade(upgrade, cost, upgradeButton));
-
-        card.add(infoPanel, BorderLayout.CENTER);
-        card.add(upgradeButton, BorderLayout.EAST);
-
-        return card;
+    private void updateCafeLevel() {
+        int newLevel = (gamesWon / 5) + 1; // Nivel nou la fiecare 5 victorii
+        cafeLevel = Math.max(cafeLevel, newLevel);
+        maxCustomers = 8 + (cafeLevel * 2); // Mai mulți clienți la nivel mai mare
     }
 
-    private JPanel createStatsTab() {
-        JPanel panel = new JPanel(new GridLayout(6, 2, 15, 15));
-        panel.setBackground(new Color(245, 222, 179));
-        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-
-        // Statistici
-        addStat(panel, "💰 Bani total câștigați:", totalEarnings + " coins");
-        addStat(panel, "📈 Venit curent/oră:", calculateHourlyIncome() + " coins");
-        addStat(panel, "👥 Clienți curenti:", customers + " clienți");
-        addStat(panel, "⭐ Bonus total joc:", getTotalGameBonus() + "%");
-        addStat(panel, "🏆 Nivel cafenea:", calculateCafeLevel() + "");
-        addStat(panel, "🎯 Eficiență:", calculateEfficiency() + "%");
-
-        // Info upgrade-uri
-        addStat(panel, "☕ Nivel cafea:", upgrades.get("coffee").getCurrentLevel() + "");
-        addStat(panel, "🍰 Nivel patiserie:", upgrades.get("pastry").getCurrentLevel() + "");
-        addStat(panel, "🎨 Nivel decor:", upgrades.get("decor").getCurrentLevel() + "");
-        addStat(panel, "🎵 Nivel muzică:", upgrades.get("music").getCurrentLevel() + "");
-        addStat(panel, "💡 Nivel lumină:", upgrades.get("lighting").getCurrentLevel() + "");
-
-        return panel;
-    }
-
-    private JScrollPane createAchievementsTab() {
-        JPanel panel = new JPanel(new GridLayout(0, 1, 10, 10));
-        panel.setBackground(new Color(245, 222, 179));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-        // Achievements
-        panel.add(createAchievementCard("🏪 Deschide Cafeneaua", "Ai deschis prima ta cafenea", true));
-        panel.add(createAchievementCard("💰 Primul Milion", "Câștigă 1,000,000 coins", money >= 1000000));
-        panel.add(createAchievementCard("⭐ Master Barista", "Upgradează cafeaua la nivel maxim",
-                upgrades.get("coffee").getCurrentLevel() >= 10));
-        panel.add(createAchievementCard("🎨 Designer Expert", "Upgradează decorul la nivel maxim",
-                upgrades.get("decor").getCurrentLevel() >= 5));
-        panel.add(createAchievementCard("👑 Împăratul Cafelei", "Ai toate upgrade-urile la nivel maxim",
-                isEverythingMaxLevel()));
-
-        JScrollPane scrollPane = new JScrollPane(panel);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-
-        return scrollPane;
-    }
-
-    private JPanel createAchievementCard(String title, String description, boolean unlocked) {
-        JPanel card = new JPanel(new BorderLayout(15, 15));
-        card.setBackground(unlocked ? new Color(220, 255, 220) : new Color(255, 220, 220));
-        card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(unlocked ? Color.GREEN : Color.RED, 2),
-                BorderFactory.createEmptyBorder(15, 15, 15, 15)
-        ));
-
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        titleLabel.setForeground(unlocked ? Color.GREEN.darker() : Color.RED.darker());
-
-        JLabel descLabel = new JLabel(description);
-        descLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-
-        JLabel statusLabel = new JLabel(unlocked ? "✅ DEBLOCAT" : "🔒 BLOCAT");
-        statusLabel.setFont(new Font("Arial", Font.BOLD, 12));
-        statusLabel.setForeground(unlocked ? Color.GREEN.darker() : Color.RED.darker());
-
-        JPanel textPanel = new JPanel(new GridLayout(2, 1));
-        textPanel.setBackground(card.getBackground());
-        textPanel.add(titleLabel);
-        textPanel.add(descLabel);
-
-        card.add(textPanel, BorderLayout.CENTER);
-        card.add(statusLabel, BorderLayout.EAST);
-
-        return card;
-    }
-
-    private void addStat(JPanel panel, String label, String value) {
-        JLabel statLabel = new JLabel(label);
-        statLabel.setFont(new Font("Arial", Font.BOLD, 14));
-
-        JLabel valueLabel = new JLabel(value);
-        valueLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        valueLabel.setForeground(Color.BLUE.darker());
-
-        panel.add(statLabel);
-        panel.add(valueLabel);
-    }
-
-    private void purchaseUpgrade(Upgrade upgrade, int cost, JButton button) {
-        if (canAfford(cost) && upgrade.canUpgrade()) {
+    // 🏪 METODE DE UPGRADE
+    public boolean upgradeItem(String item) {
+        int cost = upgradeCosts.get(item);
+        if (money >= cost) {
             money -= cost;
-            upgrade.upgrade();
+            upgrades.put(item, upgrades.get(item) + 1);
+            upgradeCosts.put(item, (int)(cost * 1.6)); // Crește costul pentru următorul upgrade
 
-            // Actualizează UI
-            button.setBackground(canAfford(upgrade.getUpgradeCost()) ?
-                    new Color(139, 69, 19) : Color.GRAY);
-            button.setEnabled(upgrade.canUpgrade() && canAfford(upgrade.getUpgradeCost()));
-            button.setText("<html><center>Upgrade<br>" + upgrade.getUpgradeCost() + " coins</center></html>");
+            // 🎯 BONUSURI LA UPGRADE
+            applyUpgradeEffects(item);
+            return true;
+        }
+        return false;
+    }
 
-            JOptionPane.showMessageDialog(null,
-                    "✅ " + upgrade.getName() + " upgradat la nivelul " + upgrade.getCurrentLevel() + "!\n" +
-                            "💰 Cost: " + cost + " coins\n" +
-                            "🎯 " + upgrade.getNextLevelDescription(),
-                    "Upgrade Reușit",
-                    JOptionPane.INFORMATION_MESSAGE);
+    private void applyUpgradeEffects(String item) {
+        switch (item) {
+            case "coffee_quality":
+                satisfaction += 5;
+                break;
+            case "pastry_variety":
+                customers += 1;
+                break;
+            case "service_speed":
+                satisfaction += 3;
+                break;
+            case "decor":
+                satisfaction += 8;
+                break;
+            case "marketing":
+                customers += 2;
+                break;
+        }
+        satisfaction = Math.min(100, satisfaction);
+    }
+
+    public void serveCustomer(Customer customer) {
+        if (customersList.contains(customer)) {
+            customer.serve();
+
+            // 🎯 BONUS SATISFACTIE PENTRU SERVIRE RAPIDA
+            satisfaction = Math.min(100, satisfaction + 5);
+
+            // 💰 VENIT IMEDIAT
+            int spending = customer.calculateSpending() / 2; // Jumătate imediat
+            money += spending;
+            totalIncome += spending;
         }
     }
 
-    private Color getUpgradeColor(String category) {
-        switch (category) {
-            case "coffee": return new Color(139, 69, 19);
-            case "pastry": return new Color(210, 105, 30);
-            case "decor": return new Color(106, 90, 205);
-            case "music": return new Color(30, 144, 255);
-            case "lighting": return new Color(255, 215, 0);
-            default: return Color.GRAY;
-        }
+    // 📊 CALCULATOARE
+    public int getHourlyIncome() {
+        int baseIncome = customers * 5; // Venit de bază de la clienți
+        int upgradeBonus = upgrades.values().stream().mapToInt(Integer::intValue).sum() * 3;
+        int customerBonus = customersList.size() * 2;
+        return baseIncome + upgradeBonus + customerBonus;
     }
 
-    // Calculatoare
-    public int calculateHourlyIncome() {
-        int income = 0;
-        for (Upgrade upgrade : upgrades.values()) {
-            income += upgrade.getBonusValue();
-        }
-        return income;
-    }
-
-    public int getTotalGameBonus() {
-        int bonus = 0;
-        for (Upgrade upgrade : upgrades.values()) {
-            bonus += (int)((upgrade.getMultiplierBonus() - 1.0) * 100);
-        }
-        return bonus;
+    public int getMaxCustomers() {
+        return 10 + (upgrades.get("marketing") * 3) + (cafeLevel * 2);
     }
 
     public int getCafeBonus() {
-        return getTotalGameBonus();
+        return (upgrades.get("coffee_quality") * 10) +
+                (upgrades.get("pastry_variety") * 8) +
+                (satisfaction / 10);
     }
 
-    public int calculateCafeLevel() {
-        int level = 0;
-        for (Upgrade upgrade : upgrades.values()) {
-            level += upgrade.getCurrentLevel();
-        }
-        return level;
+    public int getTotalValue() {
+        return money + totalIncome + (cafeLevel * 1000);
     }
 
-    public int calculateEfficiency() {
-        int maxPossible = 0;
-        for (Upgrade upgrade : upgrades.values()) {
-            maxPossible += upgrade.getMaxLevel();
-        }
-        return (int)((double) calculateCafeLevel() / maxPossible * 100);
+    public double getWinRate() {
+        return gamesPlayed == 0 ? 0 : (double) gamesWon / gamesPlayed * 100;
     }
 
-    public int getCustomersPerMinute() {
-        return upgrades.get("decor").getBonusValue() / 10;
-    }
-
-    private boolean isEverythingMaxLevel() {
-        for (Upgrade upgrade : upgrades.values()) {
-            if (upgrade.canUpgrade()) return false;
-        }
-        return true;
-    }
-
-    // Getters
+    // 🎯 GETTERS
     public int getMoney() { return money; }
+    public int getTotalIncome() { return totalIncome; }
+    public int getGamesPlayed() { return gamesPlayed; }
+    public int getGamesWon() { return gamesWon; }
+    public int getCafeLevel() { return cafeLevel; }
+    public int getCustomers() { return customers; }
+    public int getSatisfaction() { return satisfaction; }
+    public int getCustomersPerHour() { return customers * 6; }
+
+    public List<Customer> getCustomersList() { return new ArrayList<>(customersList); }
+    public int getCustomerCount() { return customersList.size(); }
+    public int getAngryCustomerCount() {
+        return (int) customersList.stream().filter(Customer::isAngry).count();
+    }
+
+    public Map<String, Integer> getUpgrades() { return new HashMap<>(upgrades); }
+    public Map<String, Integer> getUpgradeCosts() { return new HashMap<>(upgradeCosts); }
+
     public boolean canAfford(int amount) { return money >= amount; }
     public void addMoney(int amount) { money += amount; }
-    public int getCoffeeLevel() { return upgrades.get("coffee").getCurrentLevel(); }
-    public int getPastryLevel() { return upgrades.get("pastry").getCurrentLevel(); }
-    public int getDecorLevel() { return upgrades.get("decor").getCurrentLevel(); }
-    public int getMusicLevel() { return upgrades.get("music").getCurrentLevel(); }
-    public int getLightingLevel() { return upgrades.get("lighting").getCurrentLevel(); }
-    public int getTotalLevel() { return calculateCafeLevel(); }
+
+    // ☕ GETTERS PENTRU UPGRADE-URI SPECIFICE
+    public int getCoffeeLevel() { return upgrades.get("coffee_quality"); }
+    public int getPastryLevel() { return upgrades.get("pastry_variety"); }
+    public int getServiceLevel() { return upgrades.get("service_speed"); }
+    public int getDecorLevel() { return upgrades.get("decor"); }
+    public int getMarketingLevel() { return upgrades.get("marketing"); }
+
+    public void addCafeObject(CafeObject object) {
+        cafeObjects.add(object);
+    }
+
+    public List<CafeObject> getCafeObjects() {
+        return new ArrayList<>(cafeObjects);
+    }
+
+    // 💰 METODĂ PENTRU AFIȘARE FORMATATĂ
+    public String getFormattedMoney() {
+        if (money >= 1000000) {
+            return String.format("%.1fM", money / 1000000.0);
+        } else if (money >= 1000) {
+            return String.format("%.1fK", money / 1000.0);
+        }
+        return String.valueOf(money);
+    }
 }
