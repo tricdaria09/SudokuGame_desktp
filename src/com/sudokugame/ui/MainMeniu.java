@@ -1,128 +1,159 @@
 package com.sudokugame.ui;
 
-import com.sudokugame.game.SudokuGame;
+import com.sudokugame.game.Difficulty;
+import com.sudokugame.game.SudokuEngine;
 import com.sudokugame.cafe.CafeManager;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.RoundRectangle2D;
 
-public class MainMeniu extends JFrame {  // Nume corect
-    private int gamesPlayed = 0;
-    private int totalWins = 0;
+public class MainMeniu extends JFrame {
     private CafeManager cafeManager;
+    private JLabel moneyLabel;
 
-    public MainMeniu() {  // Constructor cu nume corect
+    public MainMeniu() {
         cafeManager = new CafeManager();
         initializeUI();
     }
 
     private void initializeUI() {
-        setTitle("Sudoku Game");
+        setTitle("Sudoku Master");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600);
+        setSize(900, 700);
         setLocationRelativeTo(null);
+        setResizable(false);
 
-        // 🖼️ PANEL CU FUNDAL - poți adăuga imagine aici
-        JPanel mainPanel = new JPanel(new BorderLayout()) {
+        // Panel principal cu gradient
+        JPanel mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                // Pentru imagine de fundal, de-comentează:
-                // ImageIcon background = new ImageIcon("images/background.jpg");
-                // g.drawImage(background.getImage(), 0, 0, getWidth(), getHeight(), this);
+                Graphics2D g2d = (Graphics2D) g;
+                GradientPaint gradient = new GradientPaint(0, 0, new Color(74, 144, 226),
+                        0, getHeight(), new Color(42, 94, 162));
+                g2d.setPaint(gradient);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
             }
         };
-        mainPanel.setBackground(new Color(240, 240, 240));
+        mainPanel.setLayout(new BorderLayout());
 
-        // 🎯 TITLUL JOCULUI
+        // Header cu bani și cafenea
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setOpaque(false);
+
+        moneyLabel = new JLabel("💰 " + cafeManager.getMoney() + " coins");
+        moneyLabel.setForeground(Color.WHITE);
+        moneyLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        moneyLabel.setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 0));
+
+        JButton cafeButton = createIconButton("☕", "Cafenea");
+        cafeButton.addActionListener(e -> showCafe());
+
+        headerPanel.add(moneyLabel, BorderLayout.WEST);
+        headerPanel.add(cafeButton, BorderLayout.EAST);
+
+        // Titlu central
         JLabel titleLabel = new JLabel("SUDOKU", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 48));
-        titleLabel.setForeground(new Color(70, 130, 180));
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
-        mainPanel.add(titleLabel, BorderLayout.NORTH);
+        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 72));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(50, 0, 50, 0));
 
-        // 🎮 PANEL PENTRU BUTOANE
-        JPanel buttonPanel = new JPanel(new GridLayout(4, 1, 10, 10));
-        buttonPanel.setBackground(new Color(240, 240, 240, 200)); // Semi-transparent
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(50, 100, 50, 100));
+        // Panel butoane principale
+        JPanel buttonPanel = new JPanel(new GridLayout(4, 1, 20, 20));
+        buttonPanel.setOpaque(false);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 150, 100, 150));
 
-        // 🔘 BUTOANELE PRINCIPALE
-        JButton playButton = createMenuButton("🎮 Joacă Sudoku");
-        JButton cafeButton = createMenuButton("☕ Cafenea");
-        JButton statsButton = createMenuButton("📊 Statistici");
-        JButton exitButton = createMenuButton("🚪 Ieșire");
+        JButton easyButton = createMenuButton("🎮 Ușor", new Color(76, 175, 80));
+        JButton mediumButton = createMenuButton("🎮 Mediu", new Color(255, 152, 0));
+        JButton hardButton = createMenuButton("🎮 Greu", new Color(244, 67, 54));
+        JButton statsButton = createMenuButton("📊 Statistici", new Color(156, 39, 176));
 
-        playButton.addActionListener(e -> startNewGame());
-        cafeButton.addActionListener(e -> openCafe());
+        easyButton.addActionListener(e -> startGame(Difficulty.EASY));
+        mediumButton.addActionListener(e -> startGame(Difficulty.MEDIUM));
+        hardButton.addActionListener(e -> startGame(Difficulty.HARD));
         statsButton.addActionListener(e -> showStatistics());
-        exitButton.addActionListener(e -> System.exit(0));
 
-        buttonPanel.add(playButton);
-        buttonPanel.add(cafeButton);
+        buttonPanel.add(easyButton);
+        buttonPanel.add(mediumButton);
+        buttonPanel.add(hardButton);
         buttonPanel.add(statsButton);
-        buttonPanel.add(exitButton);
 
-        mainPanel.add(buttonPanel, BorderLayout.CENTER);
-
-        // 📊 STATISTICI JOS
-        JPanel statsPanel = new JPanel(new FlowLayout());
-        statsPanel.setBackground(new Color(220, 220, 220, 200));
-        JLabel statsLabel = new JLabel("🎯 Jocuri jucate: " + gamesPlayed + " | 🏆 Victorii: " + totalWins);
-        statsLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        statsPanel.add(statsLabel);
-        mainPanel.add(statsPanel, BorderLayout.SOUTH);
+        mainPanel.add(headerPanel, BorderLayout.NORTH);
+        mainPanel.add(titleLabel, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         add(mainPanel);
     }
 
-    private JButton createMenuButton(String text) {
-        JButton button = new JButton(text);
-        button.setFont(new Font("Arial", Font.BOLD, 20));
-        button.setBackground(new Color(70, 130, 180));
-        button.setForeground(Color.WHITE);
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(15, 30, 15, 30));
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    private JButton createMenuButton(String text, Color color) {
+        JButton button = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Efect hover
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(100, 150, 200));
+                // Fundal rotund cu gradient
+                GradientPaint gradient = new GradientPaint(0, 0, color, 0, getHeight(), color.darker());
+                g2.setPaint(gradient);
+                g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 25, 25));
+
+                // Text
+                g2.setColor(Color.WHITE);
+                g2.setFont(new Font("Arial", Font.BOLD, 20));
+                FontMetrics fm = g2.getFontMetrics();
+                int x = (getWidth() - fm.stringWidth(getText())) / 2;
+                int y = (getHeight() + fm.getAscent()) / 2 - 2;
+                g2.drawString(getText(), x, y);
             }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(70, 130, 180));
-            }
-        });
+        };
+
+        button.setPreferredSize(new Dimension(200, 60));
+        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setContentAreaFilled(false);
+        button.setFocusPainted(false);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         return button;
     }
 
-    private void startNewGame() {
-        gamesPlayed++;
-        SudokuGame sudokuGame = new SudokuGame(this, cafeManager);
-        sudokuGame.setVisible(true);
+    private JButton createIconButton(String icon, String tooltip) {
+        JButton button = new JButton(icon);
+        button.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 24));
+        button.setToolTipText(tooltip);
+        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        button.setContentAreaFilled(false);
+        button.setForeground(Color.WHITE);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return button;
+    }
+
+    private void startGame(Difficulty difficulty) {
+        GamePanel gamePanel = new GamePanel(this, cafeManager, difficulty);
+        gamePanel.setVisible(true);
         this.setVisible(false);
     }
 
-    private void openCafe() {
+    private void showCafe() {
         cafeManager.showCafe();
+        updateMoneyDisplay();
     }
 
     private void showStatistics() {
         JOptionPane.showMessageDialog(this,
-                "📊 Statistici:\n\n" +
-                        "🎯 Jocuri jucate: " + gamesPlayed + "\n" +
-                        "🏆 Victorii: " + totalWins + "\n" +
-                        "💰 Bani cafenea: " + cafeManager.getMoney() + "€\n\n" +
-                        "☕ Nivel Cafea: " + cafeManager.getCoffeeLevel() + "\n" +
-                        "🍰 Nivel Patiserie: " + cafeManager.getPastryLevel() + "\n" +
-                        "🎨 Nivel Decor: " + cafeManager.getDecorLevel(),
-                "Statistici Joc",
+                "📊 Statistici Cafenea:\n\n" +
+                        "💰 Bani: " + cafeManager.getMoney() + " coins\n" +
+                        "🏆 Nivel total: " + cafeManager.getTotalLevel() + "\n\n" +
+                        "☕ Cafea: Nivel " + cafeManager.getCoffeeLevel() + "\n" +
+                        "🍰 Patiserie: Nivel " + cafeManager.getPastryLevel() + "\n" +
+                        "🎨 Decor: Nivel " + cafeManager.getDecorLevel() + "\n" +
+                        "🎵 Muzică: Nivel " + cafeManager.getMusicLevel() + "\n" +
+                        "🌟 Lumină: Nivel " + cafeManager.getLightingLevel(),
+                "Statistici",
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public void incrementWins() {
-        totalWins++;
-        cafeManager.addMoney(50); // 50 bani pentru fiecare victorie
+    public void updateMoneyDisplay() {
+        moneyLabel.setText("💰 " + cafeManager.getMoney() + " coins");
     }
 }

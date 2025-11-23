@@ -1,7 +1,6 @@
 package com.sudokugame;
 
-import com.sudokugame.ui.MainMeniu;  // Cu iu
-
+import com.sudokugame.ui.MainMeniu;
 import javax.swing.*;
 
 public class Main {
@@ -12,7 +11,7 @@ public class Main {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            new MainMeniu().setVisible(true);  // Cu iu
+            new MainMeniu().setVisible(true);
         });
     }
 }
