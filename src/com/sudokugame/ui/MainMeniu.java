@@ -22,7 +22,7 @@ public class MainMeniu extends JFrame {
     private void initializeUI() {
         setTitle("Sudoku Cafe");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600);
+        setSize(700, 500);
         setLocationRelativeTo(null);
 
         JPanel mainPanel = new JPanel(new BorderLayout()) {
@@ -46,26 +46,28 @@ public class MainMeniu extends JFrame {
 
         JPanel headerPanel = new JPanel(new FlowLayout());
         headerPanel.setBackground(AssetsLoader.getColor("header_bg"));
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
 
         moneyLabel = new JLabel("💰 " + cafeManager.getMoney() + " coins");
         cafeLevelLabel = new JLabel("🏪 Level " + cafeManager.getCafeLevel());
 
         moneyLabel.setFont(AssetsLoader.getFont("header"));
         cafeLevelLabel.setFont(AssetsLoader.getFont("header"));
+        moneyLabel.setForeground(AssetsLoader.getColor("header_text"));
+        cafeLevelLabel.setForeground(AssetsLoader.getColor("header_text"));
 
         headerPanel.add(moneyLabel);
         headerPanel.add(cafeLevelLabel);
 
-        JPanel buttonPanel = new JPanel(new GridLayout(5, 1, 10, 10));
+        JPanel buttonPanel = new JPanel(new GridLayout(5, 1, 8, 8));
         buttonPanel.setOpaque(false);
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(50, 150, 50, 150));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(30, 100, 30, 100));
 
         JButton playButton = createButton("🎮 PLAY SUDOKU", AssetsLoader.getColor("button_primary"));
-        JButton cafeButton = createButton("🏪 MANAGE CAFE", Color.ORANGE);
-        JButton statsButton = createButton("📊 STATISTICS", Color.MAGENTA);
-        JButton settingsButton = createButton("⚙️ SETTINGS", Color.BLUE);
-        JButton exitButton = createButton("🚪 EXIT", Color.RED);
+        JButton cafeButton = createButton("🏪 MANAGE CAFE", AssetsLoader.getColor("button_primary"));
+        JButton statsButton = createButton("📊 STATISTICS", AssetsLoader.getColor("button_primary"));
+        JButton settingsButton = createButton("⚙️ SETTINGS", AssetsLoader.getColor("button_primary"));
+        JButton exitButton = createButton("🚪 EXIT", new Color(220, 80, 60));
 
         playButton.addActionListener(e -> showDifficultyMenu());
         cafeButton.addActionListener(e -> openCafeScene());
@@ -81,7 +83,7 @@ public class MainMeniu extends JFrame {
 
         JLabel titleLabel = new JLabel("SUDOKU CAFE", SwingConstants.CENTER);
         titleLabel.setFont(AssetsLoader.getFont("title"));
-        titleLabel.setForeground(new Color(139, 69, 19));
+        titleLabel.setForeground(new Color(70, 130, 180));
 
         mainPanel.add(headerPanel, BorderLayout.NORTH);
         mainPanel.add(titleLabel, BorderLayout.CENTER);
@@ -94,14 +96,14 @@ public class MainMeniu extends JFrame {
         JButton button = new JButton(text);
         button.setFont(AssetsLoader.getFont("button"));
         button.setBackground(color);
-        button.setForeground(Color.BLACK);
+        button.setForeground(AssetsLoader.getColor("button_text"));
         button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        button.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(color.darker());
+                button.setBackground(AssetsLoader.getColor("button_hover"));
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 button.setBackground(color);

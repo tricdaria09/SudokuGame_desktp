@@ -44,7 +44,7 @@ public class CafeScene extends JFrame {
     private void initializeUI() {
         setTitle("My Cafe - Management");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(1024, 768);
+        setSize(900, 650);
         setLocationRelativeTo(null);
         setResizable(false);
 
@@ -83,11 +83,11 @@ public class CafeScene extends JFrame {
 
         JPanel headerPanel = createHeaderPanel();
         scenePanel.add(headerPanel);
-        headerPanel.setBounds(0, 0, getWidth(), 70);
+        headerPanel.setBounds(0, 0, getWidth(), 60);
 
         JPanel sidebarPanel = createSidebarPanel();
         scenePanel.add(sidebarPanel);
-        sidebarPanel.setBounds(getWidth() - 280, 70, 280, getHeight() - 70);
+        sidebarPanel.setBounds(getWidth() - 250, 60, 250, getHeight() - 60);
 
         scenePanel.addMouseListener(new MouseAdapter() {
             @Override
@@ -152,22 +152,22 @@ public class CafeScene extends JFrame {
     private JPanel createHeaderPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(new Color(139, 69, 19, 220));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        panel.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
 
-        JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 25, 0));
+        JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
         infoPanel.setOpaque(false);
 
         moneyLabel = new JLabel("💰 " + cafeManager.getFormattedMoney() + " coins");
         moneyLabel.setForeground(Color.WHITE);
-        moneyLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        moneyLabel.setFont(new Font("Arial", Font.BOLD, 16));
 
         satisfactionLabel = new JLabel("😊 " + cafeManager.getSatisfaction() + "%");
         satisfactionLabel.setForeground(getSatisfactionColor(cafeManager.getSatisfaction()));
-        satisfactionLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        satisfactionLabel.setFont(new Font("Arial", Font.BOLD, 16));
 
         customersLabel = new JLabel("👥 " + cafeManager.getCustomerCount() + "/" + cafeManager.getMaxCustomers());
         customersLabel.setForeground(Color.YELLOW);
-        customersLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        customersLabel.setFont(new Font("Arial", Font.BOLD, 16));
 
         infoPanel.add(moneyLabel);
         infoPanel.add(satisfactionLabel);
@@ -176,7 +176,7 @@ public class CafeScene extends JFrame {
         JButton backButton = new JButton("← Back to Menu");
         backButton.setBackground(new Color(210, 180, 140));
         backButton.setForeground(Color.BLACK);
-        backButton.setFont(new Font("Arial", Font.BOLD, 14));
+        backButton.setFont(new Font("Arial", Font.BOLD, 12));
         backButton.setFocusPainted(false);
         backButton.addActionListener(e -> goBack());
 
@@ -190,15 +190,15 @@ public class CafeScene extends JFrame {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(new Color(0, 0, 0, 200));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 15, 20, 15));
+        panel.setBorder(BorderFactory.createEmptyBorder(15, 12, 15, 12));
 
         JLabel titleLabel = new JLabel("🏪 Cafe Manager");
         titleLabel.setForeground(Color.WHITE);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         titleLabel.setAlignmentX(CENTER_ALIGNMENT);
 
         panel.add(titleLabel);
-        panel.add(Box.createRigidArea(new Dimension(0, 25)));
+        panel.add(Box.createRigidArea(new Dimension(0, 20)));
 
         addStat(panel, "Cafe Level", "⭐ " + cafeManager.getCafeLevel());
         addStat(panel, "Total Income", "💰 " + cafeManager.getTotalIncome() + " coins");
@@ -206,7 +206,7 @@ public class CafeScene extends JFrame {
         addStat(panel, "Games Won", "🏆 " + cafeManager.getGamesWon() + "/" + cafeManager.getGamesPlayed());
         addStat(panel, "Win Rate", "🎯 " + String.format("%.1f", cafeManager.getWinRate()) + "%");
 
-        panel.add(Box.createRigidArea(new Dimension(0, 25)));
+        panel.add(Box.createRigidArea(new Dimension(0, 20)));
 
         JLabel upgradeTitle = new JLabel("⚡ Quick Upgrades");
         upgradeTitle.setForeground(Color.YELLOW);
@@ -221,7 +221,7 @@ public class CafeScene extends JFrame {
         addUpgradeButton(panel, "🎨 Decor", "decor");
         addUpgradeButton(panel, "📢 Marketing", "marketing");
 
-        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+        panel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         JButton upgradeAllButton = new JButton("🚀 Upgrade All Possible");
         upgradeAllButton.setAlignmentX(CENTER_ALIGNMENT);
@@ -237,15 +237,15 @@ public class CafeScene extends JFrame {
     private void addStat(JPanel panel, String label, String value) {
         JPanel statPanel = new JPanel(new BorderLayout());
         statPanel.setOpaque(false);
-        statPanel.setBorder(BorderFactory.createEmptyBorder(8, 5, 8, 5));
+        statPanel.setBorder(BorderFactory.createEmptyBorder(6, 5, 6, 5));
 
         JLabel labelL = new JLabel(label);
         JLabel valueL = new JLabel(value);
 
         labelL.setForeground(Color.LIGHT_GRAY);
         valueL.setForeground(Color.WHITE);
-        labelL.setFont(new Font("Arial", Font.PLAIN, 14));
-        valueL.setFont(new Font("Arial", Font.BOLD, 14));
+        labelL.setFont(new Font("Arial", Font.PLAIN, 12));
+        valueL.setFont(new Font("Arial", Font.BOLD, 12));
 
         statPanel.add(labelL, BorderLayout.WEST);
         statPanel.add(valueL, BorderLayout.EAST);
@@ -256,13 +256,13 @@ public class CafeScene extends JFrame {
     private void addUpgradeButton(JPanel panel, String name, String upgradeKey) {
         JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setOpaque(false);
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
 
         int currentLevel = cafeManager.getUpgrades().get(upgradeKey);
         int cost = cafeManager.getUpgradeCosts().get(upgradeKey);
 
         JButton upgradeButton = new JButton("Lv." + currentLevel + " - " + cost + "¢");
-        upgradeButton.setFont(new Font("Arial", Font.BOLD, 12));
+        upgradeButton.setFont(new Font("Arial", Font.BOLD, 11));
         upgradeButton.setBackground(cafeManager.canAfford(cost) ? new Color(70, 130, 180) : Color.GRAY);
         upgradeButton.setForeground(Color.WHITE);
         upgradeButton.setFocusPainted(false);
@@ -270,7 +270,7 @@ public class CafeScene extends JFrame {
 
         JLabel nameLabel = new JLabel(name);
         nameLabel.setForeground(Color.WHITE);
-        nameLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        nameLabel.setFont(new Font("Arial", Font.PLAIN, 11));
 
         buttonPanel.add(nameLabel, BorderLayout.WEST);
         buttonPanel.add(upgradeButton, BorderLayout.EAST);

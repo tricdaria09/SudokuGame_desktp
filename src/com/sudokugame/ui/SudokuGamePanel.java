@@ -53,7 +53,7 @@ public class SudokuGamePanel extends JFrame {
 
     private void initializeUI() {
         setTitle("Sudoku - " + difficulty.getName());
-        setSize(800, 900);
+        setSize(700, 800);
         setLocationRelativeTo(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -88,23 +88,23 @@ public class SudokuGamePanel extends JFrame {
     private JPanel createHeaderPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(AssetsLoader.getColor("header_bg"));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
-        panel.setPreferredSize(new Dimension(getWidth(), 80));
+        panel.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        panel.setPreferredSize(new Dimension(getWidth(), 70));
 
         JPanel topRow = new JPanel(new BorderLayout());
         topRow.setOpaque(false);
 
         timerLabel = new JLabel("00:00");
-        timerLabel.setForeground(Color.BLACK);
-        timerLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        timerLabel.setForeground(AssetsLoader.getColor("header_text"));
+        timerLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
         heartsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
         heartsPanel.setOpaque(false);
-        heartsPanel.setPreferredSize(new Dimension(200, 25));
+        heartsPanel.setPreferredSize(new Dimension(150, 25));
         updateHeartsDisplay();
 
         coinsLabel = new JLabel("💰 " + cafeManager.getMoney());
-        coinsLabel.setForeground(Color.BLACK);
+        coinsLabel.setForeground(AssetsLoader.getColor("header_text"));
         coinsLabel.setFont(new Font("Arial", Font.BOLD, 16));
 
         topRow.add(timerLabel, BorderLayout.WEST);
@@ -112,7 +112,7 @@ public class SudokuGamePanel extends JFrame {
         topRow.add(coinsLabel, BorderLayout.EAST);
 
         difficultyLabel = new JLabel(difficulty.getName(), SwingConstants.CENTER);
-        difficultyLabel.setForeground(difficulty.getColor());
+        difficultyLabel.setForeground(AssetsLoader.getColor("header_text"));
         difficultyLabel.setFont(new Font("Arial", Font.BOLD, 16));
 
         panel.add(topRow, BorderLayout.NORTH);
@@ -128,13 +128,13 @@ public class SudokuGamePanel extends JFrame {
 
         for (int i = 0; i < hearts; i++) {
             JLabel heart = new JLabel("❤️");
-            heart.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20));
+            heart.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
             heartsPanel.add(heart);
         }
 
         for (int i = hearts; i < maxHearts; i++) {
             JLabel heart = new JLabel("🤍");
-            heart.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20));
+            heart.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
             heartsPanel.add(heart);
         }
 
@@ -177,7 +177,7 @@ public class SudokuGamePanel extends JFrame {
 
         sudokuGrid.setBackground(Color.WHITE);
         sudokuGrid.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-        sudokuGrid.setPreferredSize(new Dimension(500, 500));
+        sudokuGrid.setPreferredSize(new Dimension(400, 400));
 
         cells = new SudokuCell[9][9];
         int[][] board = engine.getBoard();
@@ -204,7 +204,7 @@ public class SudokuGamePanel extends JFrame {
             this.isSelected = false;
             this.isError = false;
 
-            setPreferredSize(new Dimension(50, 50));
+            setPreferredSize(new Dimension(40, 40));
             setCursor(new Cursor(Cursor.HAND_CURSOR));
 
             addMouseListener(new MouseAdapter() {
@@ -273,7 +273,7 @@ public class SudokuGamePanel extends JFrame {
                     g2d.setColor(new Color(0, 100, 200));
                 }
 
-                g2d.setFont(new Font("Arial", Font.BOLD, 20));
+                g2d.setFont(new Font("Arial", Font.BOLD, 18));
 
                 FontMetrics fm = g2d.getFontMetrics();
                 String text = String.valueOf(value);
@@ -348,10 +348,10 @@ public class SudokuGamePanel extends JFrame {
             int flashCount = 0;
             @Override
             public void actionPerformed(ActionEvent e) {
-                difficultyLabel.setForeground(flashCount % 2 == 0 ? Color.RED : difficulty.getColor());
+                difficultyLabel.setForeground(flashCount % 2 == 0 ? Color.RED : AssetsLoader.getColor("header_text"));
                 flashCount++;
                 if (flashCount > 6) {
-                    difficultyLabel.setForeground(difficulty.getColor());
+                    difficultyLabel.setForeground(AssetsLoader.getColor("header_text"));
                     ((Timer)e.getSource()).stop();
 
                     JOptionPane.showMessageDialog(SudokuGamePanel.this,
@@ -380,7 +380,7 @@ public class SudokuGamePanel extends JFrame {
     private JPanel createControlPanel() {
         JPanel panel = new JPanel(new FlowLayout());
         panel.setBackground(AssetsLoader.getColor("control_bg"));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        panel.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
 
         panel.add(createControlButton("Check", new Color(76, 175, 80), e -> checkSolution()));
         panel.add(createControlButton("Hint (25¢)", new Color(255, 152, 0), e -> showHint()));
@@ -395,13 +395,13 @@ public class SudokuGamePanel extends JFrame {
         JPanel panel = new JPanel(new GridLayout(0, 1, 2, 2));
         panel.setBackground(AssetsLoader.getColor("control_bg"));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
-        panel.setPreferredSize(new Dimension(80, 500));
+        panel.setPreferredSize(new Dimension(60, 400));
 
         for (int i = 1; i <= 9; i++) {
             JButton numberBtn = new JButton(String.valueOf(i));
-            numberBtn.setFont(new Font("Arial", Font.BOLD, 18));
+            numberBtn.setFont(new Font("Arial", Font.BOLD, 16));
             numberBtn.setBackground(AssetsLoader.getColor("button_primary"));
-            numberBtn.setForeground(Color.BLACK);
+            numberBtn.setForeground(AssetsLoader.getColor("button_text"));
             numberBtn.setFocusPainted(false);
             numberBtn.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
             numberBtn.addActionListener(e -> inputNumber(Integer.parseInt(numberBtn.getText())));
@@ -424,7 +424,7 @@ public class SudokuGamePanel extends JFrame {
         button.setBackground(color);
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+        button.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.addActionListener(action);
 

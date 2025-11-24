@@ -20,22 +20,27 @@ public class AssetsLoader {
         colors.put("menu_bg", new Color(255, 240, 245));
         colors.put("game_bg", new Color(245, 245, 240));
         colors.put("cafe_bg", new Color(255, 250, 250));
-        colors.put("button_primary", new Color(255, 200, 200));
-        colors.put("button_hover", new Color(255, 150, 150));
+
+        colors.put("button_primary", new Color(70, 130, 180));
+        colors.put("button_hover", new Color(100, 160, 210));
+        colors.put("button_text", Color.WHITE);
+
         colors.put("cell_normal", Color.WHITE);
-        colors.put("cell_selected", new Color(255, 240, 245));
-        colors.put("cell_error", new Color(255, 220, 220));
-        colors.put("header_bg", new Color(210, 180, 140));
+        colors.put("cell_selected", new Color(173, 216, 230));
+        colors.put("cell_error", new Color(255, 182, 193));
+        colors.put("header_bg", new Color(70, 130, 180));
+        colors.put("header_text", Color.WHITE);
         colors.put("grid_bg", Color.WHITE);
-        colors.put("control_bg", new Color(200, 180, 160));
+        colors.put("control_bg", new Color(70, 130, 180));
+        colors.put("control_text", Color.WHITE);
     }
 
     private static void loadFonts() {
-        fonts.put("title", new Font("Arial", Font.BOLD, 48));
-        fonts.put("header", new Font("Arial", Font.BOLD, 20));
-        fonts.put("normal", new Font("Arial", Font.PLAIN, 14));
-        fonts.put("button", new Font("Arial", Font.BOLD, 18));
-        fonts.put("cell", new Font("Arial", Font.BOLD, 20));
+        fonts.put("title", new Font("Arial", Font.BOLD, 36));
+        fonts.put("header", new Font("Arial", Font.BOLD, 16));
+        fonts.put("normal", new Font("Arial", Font.PLAIN, 12));
+        fonts.put("button", new Font("Arial", Font.BOLD, 14));
+        fonts.put("cell", new Font("Arial", Font.BOLD, 18));
     }
 
     private static void loadImages() {
@@ -43,14 +48,20 @@ public class AssetsLoader {
             images.put("menu_bg", new ImageIcon("assets/images/menu_bg.jpg").getImage());
             images.put("game_bg", new ImageIcon("assets/images/game_bg.jpg").getImage());
             images.put("cafe_scene", new ImageIcon("assets/images/cafe_scene.jpg").getImage());
-            images.put("coffee_machine", new ImageIcon("assets/images/coffee_machine.png").getImage());
-            images.put("pastry_counter", new ImageIcon("assets/images/pastry_counter.png").getImage());
-            images.put("register", new ImageIcon("assets/images/register.png").getImage());
-            images.put("table", new ImageIcon("assets/images/table.png").getImage());
-            images.put("customer", new ImageIcon("assets/images/customer.png").getImage());
-            System.out.println("✅ Toate imaginile au fost încărcate cu succes!");
+
+            if (images.get("menu_bg") == null) {
+                images.put("menu_bg", new ImageIcon("assets/images/menu_bg.jpeg").getImage());
+            }
+            if (images.get("game_bg") == null) {
+                images.put("game_bg", new ImageIcon("assets/images/game_bg.jpeg").getImage());
+            }
+            if (images.get("cafe_scene") == null) {
+                images.put("cafe_scene", new ImageIcon("assets/images/cafe_scene.jpeg").getImage());
+            }
+
+            System.out.println("✅ Imagini încărcate cu succes!");
         } catch (Exception e) {
-            System.out.println("⚠️ Unele imagini nu au putut fi încărcate: " + e.getMessage());
+            System.out.println("⚠️ Nu s-au putut încărca imaginile: " + e.getMessage());
         }
     }
 
