@@ -8,10 +8,7 @@ import javax.swing.*;
 public class Main {
     public static void main(String[] args) {
         try {
-            // Încarcă assets-urile
             AssetsLoader.loadAssets();
-
-            // Setează look and feel-ul sistemului
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             e.printStackTrace();

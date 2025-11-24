@@ -18,7 +18,6 @@ public class SudokuGamePanel extends JFrame {
     private Timer gameTimer;
     private int secondsElapsed;
 
-    // 🎯 SISTEM DE INIMI
     private int hearts;
     private int maxHearts;
     private JPanel heartsPanel;
@@ -36,7 +35,6 @@ public class SudokuGamePanel extends JFrame {
         this.difficulty = difficulty;
         this.engine = new SudokuEngine(difficulty);
 
-        // 🎯 SETEAZĂ NUMĂRUL DE INIMI PE BAZA DIFICULTĂȚII
         this.maxHearts = getMaxHeartsForDifficulty();
         this.hearts = maxHearts;
 
@@ -60,32 +58,28 @@ public class SudokuGamePanel extends JFrame {
         setResizable(false);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        // 🎨 BACKGROUND CU CULORILE NOASTRE
         JPanel mainPanel = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
-
-                GradientPaint gradient = new GradientPaint(
-                        0, 0, AssetsLoader.getColor("menu_bg"),
-                        getWidth(), getHeight(), AssetsLoader.getColor("game_bg")
-                );
-                g2d.setPaint(gradient);
-                g2d.fillRect(0, 0, getWidth(), getHeight());
+                Image background = AssetsLoader.getImage("game_bg");
+                if (background != null) {
+                    g2d.drawImage(background, 0, 0, getWidth(), getHeight(), this);
+                } else {
+                    GradientPaint gradient = new GradientPaint(
+                            0, 0, AssetsLoader.getColor("menu_bg"),
+                            getWidth(), getHeight(), AssetsLoader.getColor("game_bg")
+                    );
+                    g2d.setPaint(gradient);
+                    g2d.fillRect(0, 0, getWidth(), getHeight());
+                }
             }
         };
 
-        // 🎯 HEADER CU INFO ȘI INIMI
         mainPanel.add(createHeaderPanel(), BorderLayout.NORTH);
-
-        // 🔢 GRID SUDOKU CENTRAL
         mainPanel.add(createSudokuGrid(), BorderLayout.CENTER);
-
-        // 🎮 PANEL CONTROL
         mainPanel.add(createControlPanel(), BorderLayout.SOUTH);
-
-        // 🔢 PANEL NUMERE (Tastatură virtuală)
         mainPanel.add(createNumberPanel(), BorderLayout.EAST);
 
         add(mainPanel);
@@ -97,22 +91,18 @@ public class SudokuGamePanel extends JFrame {
         panel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
         panel.setPreferredSize(new Dimension(getWidth(), 80));
 
-        // 🎯 RÂND SUPERIOR: TIMER + INIMI
         JPanel topRow = new JPanel(new BorderLayout());
         topRow.setOpaque(false);
 
-        // ⏰ TIMER
         timerLabel = new JLabel("00:00");
         timerLabel.setForeground(Color.BLACK);
         timerLabel.setFont(new Font("Arial", Font.BOLD, 20));
 
-        // ❤️ INIMI - CREATĂ PRIMUL
         heartsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
         heartsPanel.setOpaque(false);
         heartsPanel.setPreferredSize(new Dimension(200, 25));
-        updateHeartsDisplay(); // ACUM heartsPanel NU MAI E NULL
+        updateHeartsDisplay();
 
-        // 💰 MONEDE
         coinsLabel = new JLabel("💰 " + cafeManager.getMoney());
         coinsLabel.setForeground(Color.BLACK);
         coinsLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -121,7 +111,6 @@ public class SudokuGamePanel extends JFrame {
         topRow.add(heartsPanel, BorderLayout.CENTER);
         topRow.add(coinsLabel, BorderLayout.EAST);
 
-        // 🎯 RÂND INFERIOR: DIFICULTATE
         difficultyLabel = new JLabel(difficulty.getName(), SwingConstants.CENTER);
         difficultyLabel.setForeground(difficulty.getColor());
         difficultyLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -133,7 +122,7 @@ public class SudokuGamePanel extends JFrame {
     }
 
     private void updateHeartsDisplay() {
-        if (heartsPanel == null) return; // PROTECȚIE ÎMPOTRIVA NULL
+        if (heartsPanel == null) return;
 
         heartsPanel.removeAll();
 

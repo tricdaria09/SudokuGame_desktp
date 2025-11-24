@@ -36,16 +36,14 @@ public class CafeObject {
     }
 
     public void draw(Graphics2D g2d) {
-        // 🖼️ DESENEAZĂ IMAGINEA OBIECTULUI
         Image image = AssetsLoader.getImage(imageKey);
         if (image != null) {
             g2d.drawImage(image, x, y, width, height, (ImageObserver) null);
         } else {
-            // Fallback la rectangle colorat dacă imaginea nu există
             if (isHighlighted) {
-                g2d.setColor(new Color(255, 255, 0, 100)); // Galben transparent
+                g2d.setColor(new Color(255, 255, 0, 100));
             } else {
-                g2d.setColor(new Color(139, 69, 19, 200)); // Maro cafenea
+                g2d.setColor(new Color(139, 69, 19, 200));
             }
             g2d.fillRect(x, y, width, height);
 
@@ -54,13 +52,11 @@ public class CafeObject {
             g2d.drawString(name, x + 5, y + height/2);
         }
 
-        // 🔥 Efect de highlight când e selectat
         if (isHighlighted) {
             g2d.setColor(new Color(255, 255, 0, 80));
             g2d.fillRect(x, y, width, height);
         }
 
-        // ⭐ INDICATOR NIVEL
         g2d.setColor(Color.YELLOW);
         g2d.setFont(new Font("Arial", Font.BOLD, 14));
         g2d.drawString("Lv." + level, x + width - 30, y + 20);
@@ -87,7 +83,6 @@ public class CafeObject {
         return level * 2;
     }
 
-    // Getters și Setters
     public String getName() { return name; }
     public int getLevel() { return level; }
     public int getX() { return x; }

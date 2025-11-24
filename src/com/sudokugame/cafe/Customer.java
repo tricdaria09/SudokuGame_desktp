@@ -18,19 +18,12 @@ public class Customer {
     private String type;
     private Random random;
 
-    // 🎯 TIPURI DE CLIENTI
     public static final String[] CUSTOMER_TYPES = {
             "business", "student", "tourist", "regular"
     };
 
-    // 🎯 STĂRILE CLIENTULUI
     public enum CustomerState {
-        ENTERING,      // Intra în cafenea
-        WAITING,       // Așteaptă la coadă
-        ORDERING,      // Plasează comanda
-        EATING,        // Mănâncă/bea
-        LEAVING,       // Pleacă
-        ANGRY          // Pleacă nemulțumit
+        ENTERING, WAITING, ORDERING, EATING, LEAVING, ANGRY
     }
 
     public Customer(int startX, int startY) {
@@ -39,24 +32,22 @@ public class Customer {
         this.y = startY;
         this.width = 60;
         this.height = 90;
-        this.speed = 2 + random.nextInt(3); // Viteză între 2-4
+        this.speed = 2 + random.nextInt(3);
         this.state = CustomerState.ENTERING;
         this.type = CUSTOMER_TYPES[random.nextInt(CUSTOMER_TYPES.length)];
         this.maxPatience = calculateMaxPatience();
         this.patience = maxPatience;
         this.satisfaction = 100;
-
-        // 🎯 SETEAZĂ DESTINAȚIA INIȚIALĂ (intrare cafenea)
         this.targetX = 300 + random.nextInt(200);
         this.targetY = 250 + random.nextInt(100);
     }
 
     private int calculateMaxPatience() {
         switch (type) {
-            case "business": return 120; // Mai puțin răbdare
-            case "student": return 180;  // Multă răbdare
-            case "tourist": return 150;  // Răbdare medie
-            case "regular": return 200;  // Foarte multă răbdare
+            case "business": return 120;
+            case "student": return 180;
+            case "tourist": return 150;
+            case "regular": return 200;
             default: return 150;
         }
     }
@@ -66,7 +57,6 @@ public class Customer {
             case ENTERING:
                 moveToTarget();
                 if (hasReachedTarget()) {
-                    // 🎯 AJUNS LA DESTINAȚIE - ÎNCEPE SĂ AȘTEPTE
                     state = CustomerState.WAITING;
                     setRandomWaitTarget();
                 }
@@ -76,12 +66,10 @@ public class Customer {
                 patience--;
                 satisfaction = (int)((double)patience / maxPatience * 100);
 
-                // 🎯 CLIENTUL SE ENERVEAZĂ DACA AȘTEAPTĂ PREA MULT
                 if (patience <= 0) {
                     state = CustomerState.ANGRY;
                     setExitTarget();
                 } else if (patience < maxPatience / 3) {
-                    // Schimbă poziția dacă așteaptă prea mult
                     if (random.nextInt(100) < 5) {
                         setRandomWaitTarget();
                     }
@@ -89,7 +77,6 @@ public class Customer {
                 break;
 
             case ORDERING:
-                // Simulează timpul de plasare a comenzii
                 patience--;
                 if (patience <= maxPatience / 2) {
                     state = CustomerState.EATING;
@@ -98,7 +85,6 @@ public class Customer {
                 break;
 
             case EATING:
-                // 🍩 MĂNÂNCĂ/BEA
                 patience--;
                 if (patience <= 0) {
                     state = CustomerState.LEAVING;
@@ -110,41 +96,32 @@ public class Customer {
             case ANGRY:
                 moveToTarget();
                 if (x < -100 || x > 1000 || y < -100 || y > 800) {
-                    // 🚪 CLIENTUL A PLECAT
-                    state = null; // Marchează pentru eliminare
+                    state = null;
                 }
                 break;
         }
     }
 
     public void draw(Graphics2D g2d) {
-        // 🖼️ DESENEAZĂ CLIENTUL CU IMAGINE
         Image customerImage = AssetsLoader.getImage("customer");
         if (customerImage != null) {
             g2d.drawImage(customerImage, x, y, width, height, (ImageObserver) null);
         } else {
-            // 🎨 FALLBACK LA FORME GEOMETRICE
             drawFallbackCustomer(g2d);
         }
 
-        // 📊 BARĂ DE RĂBDARE
         drawPatienceBar(g2d);
-
-        // 😊 EMOJI BASED ON STATE
         drawEmoji(g2d);
     }
 
     private void drawFallbackCustomer(Graphics2D g2d) {
-        // 🎨 CULOARE BASED ON TYPE
         Color bodyColor = getCustomerColor();
         g2d.setColor(bodyColor);
-        g2d.fillRect(x, y, width, height - 20); // Corp
+        g2d.fillRect(x, y, width, height - 20);
 
-        // 👤 CAP
-        g2d.setColor(new Color(255, 220, 177)); // Piele
+        g2d.setColor(new Color(255, 220, 177));
         g2d.fillOval(x + 15, y - 10, 30, 30);
 
-        // STATE INDICATOR
         g2d.setColor(getStateColor());
         g2d.fillRect(x, y + height - 15, width, 5);
     }
@@ -155,17 +132,14 @@ public class Customer {
         int barX = x + (width - barWidth) / 2;
         int barY = y - 15;
 
-        // 🎯 FUNDAL BARĂ
         g2d.setColor(new Color(100, 100, 100, 200));
         g2d.fillRect(barX, barY, barWidth, barHeight);
 
-        // 🎯 BARĂ DE RĂBDARE
         double patienceRatio = (double) patience / maxPatience;
         Color barColor = getPatienceColor(patienceRatio);
         g2d.setColor(barColor);
         g2d.fillRect(barX, barY, (int)(barWidth * patienceRatio), barHeight);
 
-        // 🎯 BORDER
         g2d.setColor(Color.BLACK);
         g2d.drawRect(barX, barY, barWidth, barHeight);
     }
@@ -179,10 +153,10 @@ public class Customer {
 
     private Color getCustomerColor() {
         switch (type) {
-            case "business": return new Color(100, 100, 200); // Albastru
-            case "student": return new Color(200, 100, 100);  // Roșu
-            case "tourist": return new Color(100, 200, 100);  // Verde
-            case "regular": return new Color(200, 200, 100);  // Galben
+            case "business": return new Color(100, 100, 200);
+            case "student": return new Color(200, 100, 100);
+            case "tourist": return new Color(100, 200, 100);
+            case "regular": return new Color(200, 200, 100);
             default: return Color.GRAY;
         }
     }
@@ -219,7 +193,6 @@ public class Customer {
     }
 
     private void moveToTarget() {
-        // 🎯 MISCARE SPRE TINTĂ
         int dx = targetX - x;
         int dy = targetY - y;
         double distance = Math.sqrt(dx * dx + dy * dy);
@@ -238,19 +211,16 @@ public class Customer {
     }
 
     private void setRandomWaitTarget() {
-        // 🎯 POZIȚIE ALEATOARE PENTRU AȘTEPTARE
         targetX = 250 + random.nextInt(300);
         targetY = 200 + random.nextInt(200);
     }
 
     private void setEatingTarget() {
-        // 🎯 MERGE LA MASĂ
         targetX = 200 + random.nextInt(400);
         targetY = 400 + random.nextInt(100);
     }
 
     private void setExitTarget() {
-        // 🚪 MERGE SPRE IEȘIRE
         targetX = -100;
         targetY = 300 + random.nextInt(200);
     }
@@ -258,7 +228,6 @@ public class Customer {
     public void startOrdering() {
         if (state == CustomerState.WAITING) {
             state = CustomerState.ORDERING;
-            // Reset patience for ordering phase
             patience = maxPatience / 2;
         }
     }
@@ -267,12 +236,10 @@ public class Customer {
         if (state == CustomerState.ORDERING) {
             state = CustomerState.EATING;
             setEatingTarget();
-            // Bonus satisfaction pentru servire rapidă
             satisfaction = Math.min(100, satisfaction + 20);
         }
     }
 
-    // 🎯 GETTERS
     public int getX() { return x; }
     public int getY() { return y; }
     public int getWidth() { return width; }
@@ -296,7 +263,6 @@ public class Customer {
     }
 
     public int calculateSpending() {
-        // 💰 CAT CHELTUIE CLIENTUL
         int baseSpending = 0;
         switch (type) {
             case "business": baseSpending = 15; break;
@@ -305,7 +271,6 @@ public class Customer {
             case "regular": baseSpending = 10; break;
         }
 
-        // 🎯 BONUS SATISFACTIE
         double satisfactionBonus = satisfaction / 100.0;
         return (int)(baseSpending * (1.0 + satisfactionBonus * 0.5));
     }

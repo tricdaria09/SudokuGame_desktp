@@ -29,7 +29,6 @@ public class CafeScene extends JFrame {
     }
 
     private void initializeCafeObjects() {
-        // 🏪 OBIECTELE DIN CAFENEA - poziții personalizabile
         cafeObjects.add(new CafeObject("Coffee Machine", 100, 200, 150, 200, "coffee_machine"));
         cafeObjects.add(new CafeObject("Pastry Counter", 300, 200, 150, 150, "pastry_counter"));
         cafeObjects.add(new CafeObject("Register", 500, 250, 120, 120, "register"));
@@ -37,7 +36,6 @@ public class CafeScene extends JFrame {
         cafeObjects.add(new CafeObject("Table 2", 400, 400, 100, 100, "table"));
         cafeObjects.add(new CafeObject("Table 3", 600, 400, 100, 100, "table"));
 
-        // Adaugă obiectele în manager
         for (CafeObject obj : cafeObjects) {
             cafeManager.addCafeObject(obj);
         }
@@ -50,54 +48,47 @@ public class CafeScene extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
 
-        // 🖼️ SCENĂ CAFENEA CU BACKGROUND
         JPanel scenePanel = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
 
-                // ⬇️🖼️ BACKGROUND CAFENEA - CULOARE
-                GradientPaint gradient = new GradientPaint(
-                        0, 0, AssetsLoader.getColor("cafe_bg"),
-                        getWidth(), getHeight(), AssetsLoader.getColor("menu_bg")
-                );
-                g2d.setPaint(gradient);
-                g2d.fillRect(0, 0, getWidth(), getHeight());
+                Image background = AssetsLoader.getImage("cafe_scene");
+                if (background != null) {
+                    g2d.drawImage(background, 0, 0, getWidth(), getHeight(), this);
+                } else {
+                    GradientPaint gradient = new GradientPaint(
+                            0, 0, AssetsLoader.getColor("cafe_bg"),
+                            getWidth(), getHeight(), AssetsLoader.getColor("menu_bg")
+                    );
+                    g2d.setPaint(gradient);
+                    g2d.fillRect(0, 0, getWidth(), getHeight());
+                    g2d.setColor(new Color(160, 120, 80));
+                    g2d.fillRect(0, 500, getWidth(), getHeight() - 500);
+                    g2d.setColor(new Color(200, 200, 200));
+                    g2d.fillRect(0, 0, getWidth(), 100);
+                }
 
-                // 🏪 DESENE AZĂ ELEMENTE DE BAZĂ
-                g2d.setColor(new Color(160, 120, 80));
-                g2d.fillRect(0, 500, getWidth(), getHeight() - 500); // Podea
-
-                g2d.setColor(new Color(200, 200, 200));
-                g2d.fillRect(0, 0, getWidth(), 100); // Tavan
-
-                // 🏪 DESENEAZĂ OBIECTELE CAFENELEI
                 for (CafeObject obj : cafeObjects) {
                     obj.draw(g2d);
                 }
 
-                // 👥 DESENEAZĂ CLIENTII
                 drawCustomers(g2d);
-
-                // 💬 DESENEAZĂ INTERACȚIUNI
                 drawCustomerInteractions(g2d);
             }
         };
 
-        scenePanel.setLayout(null); // Pentru poziționare absolută a elementelor
+        scenePanel.setLayout(null);
 
-        // 🎯 HEADER
         JPanel headerPanel = createHeaderPanel();
         scenePanel.add(headerPanel);
         headerPanel.setBounds(0, 0, getWidth(), 70);
 
-        // 🎮 SIDEBAR CONTROALE
         JPanel sidebarPanel = createSidebarPanel();
         scenePanel.add(sidebarPanel);
         sidebarPanel.setBounds(getWidth() - 280, 70, 280, getHeight() - 70);
 
-        // 🖱️ CLICK PE OBIECTELE CAFENELEI
         scenePanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -105,7 +96,6 @@ public class CafeScene extends JFrame {
             }
         });
 
-        // 🔄 REFRESH CONTINUU
         javax.swing.Timer refreshTimer = new javax.swing.Timer(100, e -> scenePanel.repaint());
         refreshTimer.start();
 
@@ -113,7 +103,6 @@ public class CafeScene extends JFrame {
     }
 
     private void drawCustomers(Graphics2D g2d) {
-        // 👥 DESENEAZĂ TOȚI CLIENTII
         for (Customer customer : cafeManager.getCustomersList()) {
             customer.draw(g2d);
         }
@@ -122,11 +111,9 @@ public class CafeScene extends JFrame {
     private void drawCustomerInteractions(Graphics2D g2d) {
         for (Customer customer : cafeManager.getCustomersList()) {
             if (customer.isReadyToOrder()) {
-                // 💬 INDICATOR "READY TO ORDER"
                 g2d.setColor(new Color(0, 200, 0, 200));
                 g2d.fillOval(customer.getX() + customer.getWidth() - 15,
                         customer.getY() - 25, 25, 25);
-
                 g2d.setColor(Color.WHITE);
                 g2d.setFont(new Font("Arial", Font.BOLD, 14));
                 g2d.drawString("📝", customer.getX() + customer.getWidth() - 12,
@@ -134,11 +121,9 @@ public class CafeScene extends JFrame {
             }
 
             if (customer.isAngry()) {
-                // 😠 INDICATOR ANGRY
                 g2d.setColor(new Color(255, 0, 0, 200));
                 g2d.fillOval(customer.getX() + customer.getWidth() - 15,
                         customer.getY() - 25, 25, 25);
-
                 g2d.setColor(Color.WHITE);
                 g2d.setFont(new Font("Arial", Font.BOLD, 14));
                 g2d.drawString("😠", customer.getX() + customer.getWidth() - 12,
@@ -148,7 +133,6 @@ public class CafeScene extends JFrame {
     }
 
     private void handleObjectClick(int x, int y) {
-        // Verifică dacă s-a dat click pe un client
         for (Customer customer : cafeManager.getCustomersList()) {
             if (x >= customer.getX() && x <= customer.getX() + customer.getWidth() &&
                     y >= customer.getY() && y <= customer.getY() + customer.getHeight()) {
@@ -157,7 +141,6 @@ public class CafeScene extends JFrame {
             }
         }
 
-        // Verifică obiectele cafenelei
         for (CafeObject obj : cafeObjects) {
             if (obj.contains(x, y)) {
                 showObjectMenu(obj, x, y);
@@ -171,7 +154,6 @@ public class CafeScene extends JFrame {
         panel.setBackground(new Color(139, 69, 19, 220));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        // 🏪 INFO CAFENEA
         JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 25, 0));
         infoPanel.setOpaque(false);
 
@@ -191,7 +173,6 @@ public class CafeScene extends JFrame {
         infoPanel.add(satisfactionLabel);
         infoPanel.add(customersLabel);
 
-        // 🔙 BUTON ÎNAPOI
         JButton backButton = new JButton("← Back to Menu");
         backButton.setBackground(new Color(210, 180, 140));
         backButton.setForeground(Color.BLACK);
@@ -219,7 +200,6 @@ public class CafeScene extends JFrame {
         panel.add(titleLabel);
         panel.add(Box.createRigidArea(new Dimension(0, 25)));
 
-        // 📊 STATISTICI
         addStat(panel, "Cafe Level", "⭐ " + cafeManager.getCafeLevel());
         addStat(panel, "Total Income", "💰 " + cafeManager.getTotalIncome() + " coins");
         addStat(panel, "Hourly Income", "📈 " + cafeManager.getHourlyIncome() + "/h");
@@ -228,7 +208,6 @@ public class CafeScene extends JFrame {
 
         panel.add(Box.createRigidArea(new Dimension(0, 25)));
 
-        // ⬆️ UPGRADE-URI RAPIDE
         JLabel upgradeTitle = new JLabel("⚡ Quick Upgrades");
         upgradeTitle.setForeground(Color.YELLOW);
         upgradeTitle.setFont(new Font("Arial", Font.BOLD, 16));
@@ -244,7 +223,6 @@ public class CafeScene extends JFrame {
 
         panel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // 🎯 BUTON UPGRADE TOATE
         JButton upgradeAllButton = new JButton("🚀 Upgrade All Possible");
         upgradeAllButton.setAlignmentX(CENTER_ALIGNMENT);
         upgradeAllButton.setBackground(new Color(76, 175, 80));

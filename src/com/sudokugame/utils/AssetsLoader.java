@@ -17,22 +17,20 @@ public class AssetsLoader {
     }
 
     private static void loadColors() {
-        // 🎨 PALETA DE CULORI: alb, roz, bej deschis
-        colors.put("menu_bg", new Color(255, 240, 245));     // Roz foarte deschis
-        colors.put("game_bg", new Color(245, 245, 240));     // Bej deschis
-        colors.put("cafe_bg", new Color(255, 250, 250));     // Alb cu nuanță caldă
-        colors.put("button_primary", new Color(255, 200, 200)); // Roz deschis
-        colors.put("button_hover", new Color(255, 150, 150));   // Roz mediu
+        colors.put("menu_bg", new Color(255, 240, 245));
+        colors.put("game_bg", new Color(245, 245, 240));
+        colors.put("cafe_bg", new Color(255, 250, 250));
+        colors.put("button_primary", new Color(255, 200, 200));
+        colors.put("button_hover", new Color(255, 150, 150));
         colors.put("cell_normal", Color.WHITE);
-        colors.put("cell_selected", new Color(255, 240, 245));  // Roz foarte deschis
-        colors.put("cell_error", new Color(255, 220, 220));     // Roz pentru erori
-        colors.put("header_bg", new Color(210, 180, 140));      // Bej
+        colors.put("cell_selected", new Color(255, 240, 245));
+        colors.put("cell_error", new Color(255, 220, 220));
+        colors.put("header_bg", new Color(210, 180, 140));
         colors.put("grid_bg", Color.WHITE);
-        colors.put("control_bg", new Color(200, 180, 160));     // Bej mai închis
+        colors.put("control_bg", new Color(200, 180, 160));
     }
 
     private static void loadFonts() {
-        // Fonturi de bază
         fonts.put("title", new Font("Arial", Font.BOLD, 48));
         fonts.put("header", new Font("Arial", Font.BOLD, 20));
         fonts.put("normal", new Font("Arial", Font.PLAIN, 14));
@@ -42,8 +40,15 @@ public class AssetsLoader {
 
     private static void loadImages() {
         try {
-            // Poți adăuga imagini aici dacă vrei
-            // images.put("customer", new ImageIcon("assets/customer.png").getImage());
+            images.put("menu_bg", new ImageIcon("assets/images/menu_bg.jpg").getImage());
+            images.put("game_bg", new ImageIcon("assets/images/game_bg.jpg").getImage());
+            images.put("cafe_scene", new ImageIcon("assets/images/cafe_scene.jpg").getImage());
+            images.put("coffee_machine", new ImageIcon("assets/images/coffee_machine.png").getImage());
+            images.put("pastry_counter", new ImageIcon("assets/images/pastry_counter.png").getImage());
+            images.put("register", new ImageIcon("assets/images/register.png").getImage());
+            images.put("table", new ImageIcon("assets/images/table.png").getImage());
+            images.put("customer", new ImageIcon("assets/images/customer.png").getImage());
+            System.out.println("✅ Toate imaginile au fost încărcate cu succes!");
         } catch (Exception e) {
             System.out.println("⚠️ Unele imagini nu au putut fi încărcate: " + e.getMessage());
         }

@@ -30,17 +30,20 @@ public class MainMeniu extends JFrame {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
-
-                GradientPaint gradient = new GradientPaint(
-                        0, 0, AssetsLoader.getColor("menu_bg"),
-                        getWidth(), getHeight(), Color.WHITE
-                );
-                g2d.setPaint(gradient);
-                g2d.fillRect(0, 0, getWidth(), getHeight());
+                Image background = AssetsLoader.getImage("menu_bg");
+                if (background != null) {
+                    g2d.drawImage(background, 0, 0, getWidth(), getHeight(), this);
+                } else {
+                    GradientPaint gradient = new GradientPaint(
+                            0, 0, AssetsLoader.getColor("menu_bg"),
+                            getWidth(), getHeight(), Color.WHITE
+                    );
+                    g2d.setPaint(gradient);
+                    g2d.fillRect(0, 0, getWidth(), getHeight());
+                }
             }
         };
 
-        // Header
         JPanel headerPanel = new JPanel(new FlowLayout());
         headerPanel.setBackground(AssetsLoader.getColor("header_bg"));
         headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
@@ -54,7 +57,6 @@ public class MainMeniu extends JFrame {
         headerPanel.add(moneyLabel);
         headerPanel.add(cafeLevelLabel);
 
-        // Butoane
         JPanel buttonPanel = new JPanel(new GridLayout(5, 1, 10, 10));
         buttonPanel.setOpaque(false);
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(50, 150, 50, 150));
@@ -66,7 +68,7 @@ public class MainMeniu extends JFrame {
         JButton exitButton = createButton("🚪 EXIT", Color.RED);
 
         playButton.addActionListener(e -> showDifficultyMenu());
-        cafeButton.addActionListener(e -> showCafeMessage());
+        cafeButton.addActionListener(e -> openCafeScene());
         statsButton.addActionListener(e -> showStatistics());
         settingsButton.addActionListener(e -> showSettings());
         exitButton.addActionListener(e -> System.exit(0));
@@ -77,7 +79,6 @@ public class MainMeniu extends JFrame {
         buttonPanel.add(settingsButton);
         buttonPanel.add(exitButton);
 
-        // Titlu
         JLabel titleLabel = new JLabel("SUDOKU CAFE", SwingConstants.CENTER);
         titleLabel.setFont(AssetsLoader.getFont("title"));
         titleLabel.setForeground(new Color(139, 69, 19));
@@ -98,7 +99,6 @@ public class MainMeniu extends JFrame {
         button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // Efect hover
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(color.darker());
@@ -109,6 +109,12 @@ public class MainMeniu extends JFrame {
         });
 
         return button;
+    }
+
+    private void openCafeScene() {
+        this.setVisible(false);
+        CafeScene cafeScene = new CafeScene(this, cafeManager);
+        cafeScene.setVisible(true);
     }
 
     private void showDifficultyMenu() {
@@ -155,22 +161,9 @@ public class MainMeniu extends JFrame {
 
         cafeManager.addMoney(-cost);
         updateDisplay();
-
-        // Ascunde meniul principal
         setVisible(false);
-
-        // Creează fereastra de joc Sudoku
         SudokuGamePanel gamePanel = new SudokuGamePanel(this, cafeManager, difficulty);
         gamePanel.setVisible(true);
-    }
-
-    private void showCafeMessage() {
-        JOptionPane.showMessageDialog(this,
-                "🏪 Cafe Management\n\n" +
-                        "This feature will be available\n" +
-                        "in the next update!",
-                "Coming Soon",
-                JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void showStatistics() {
