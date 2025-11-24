@@ -16,11 +16,8 @@ public class SudokuEngine {
     }
 
     private void generateNewPuzzle() {
-        // Generate a complete solution
         solution = generateCompleteSolution();
         board = copyArray(solution);
-
-        // Remove numbers based on difficulty
         removeNumbers(difficulty.getCellsToRemove());
         userBoard = copyArray(board);
     }
@@ -52,17 +49,14 @@ public class SudokuEngine {
     }
 
     private boolean isValid(int[][] grid, int row, int col, int num) {
-        // Check row
         for (int x = 0; x < 9; x++) {
             if (grid[row][x] == num) return false;
         }
 
-        // Check column
         for (int x = 0; x < 9; x++) {
             if (grid[x][col] == num) return false;
         }
 
-        // Check 3x3 box
         int startRow = row - row % 3;
         int startCol = col - col % 3;
         for (int i = 0; i < 3; i++) {
@@ -106,7 +100,7 @@ public class SudokuEngine {
     }
 
     public void setCellValue(int row, int col, int value) {
-        if (board[row][col] == 0) { // Only allow setting empty cells
+        if (board[row][col] == 0) {
             userBoard[row][col] = value;
         }
     }
@@ -124,7 +118,6 @@ public class SudokuEngine {
     }
 
     public void provideHint() {
-        // Find an empty cell and fill it with solution
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 if (userBoard[i][j] == 0) {

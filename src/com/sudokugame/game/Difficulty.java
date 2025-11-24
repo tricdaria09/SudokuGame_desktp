@@ -3,9 +3,9 @@ package com.sudokugame.game;
 import java.awt.Color;
 
 public enum Difficulty {
-    EASY("Ușor", Color.GREEN, 50, 35),
-    MEDIUM("Mediu", Color.ORANGE, 100, 28),
-    HARD("Greu", Color.RED, 200, 22);
+    EASY("Easy", Color.GREEN, 50, 35),
+    MEDIUM("Medium", Color.ORANGE, 100, 45),
+    HARD("Hard", Color.RED, 200, 55);
 
     private final String name;
     private final Color color;

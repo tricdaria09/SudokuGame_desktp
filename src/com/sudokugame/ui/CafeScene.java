@@ -57,24 +57,20 @@ public class CafeScene extends JFrame {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
 
-                // ⬇️🖼️ BACKGROUND CAFENEA - SCHIMBĂ CU SCENA TA!
-                Image background = AssetsLoader.getImage("cafe_scene");
-                if (background != null) {
-                    g2d.drawImage(background, 0, 0, getWidth(), getHeight(), this);
-                } else {
-                    // Fallback la culoare
-                    GradientPaint gradient = new GradientPaint(0, 0, new Color(210, 180, 140),
-                            0, getHeight(), new Color(190, 160, 120));
-                    g2d.setPaint(gradient);
-                    g2d.fillRect(0, 0, getWidth(), getHeight());
+                // ⬇️🖼️ BACKGROUND CAFENEA - CULOARE
+                GradientPaint gradient = new GradientPaint(
+                        0, 0, AssetsLoader.getColor("cafe_bg"),
+                        getWidth(), getHeight(), AssetsLoader.getColor("menu_bg")
+                );
+                g2d.setPaint(gradient);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
 
-                    // 🏪 DESENE AZĂ ELEMENTE DE BAZĂ
-                    g2d.setColor(new Color(160, 120, 80));
-                    g2d.fillRect(0, 500, getWidth(), getHeight() - 500); // Podea
+                // 🏪 DESENE AZĂ ELEMENTE DE BAZĂ
+                g2d.setColor(new Color(160, 120, 80));
+                g2d.fillRect(0, 500, getWidth(), getHeight() - 500); // Podea
 
-                    g2d.setColor(new Color(200, 200, 200));
-                    g2d.fillRect(0, 0, getWidth(), 100); // Tavan
-                }
+                g2d.setColor(new Color(200, 200, 200));
+                g2d.fillRect(0, 0, getWidth(), 100); // Tavan
 
                 // 🏪 DESENEAZĂ OBIECTELE CAFENELEI
                 for (CafeObject obj : cafeObjects) {
@@ -110,7 +106,7 @@ public class CafeScene extends JFrame {
         });
 
         // 🔄 REFRESH CONTINUU
-        Timer refreshTimer = new Timer(100, e -> scenePanel.repaint());
+        javax.swing.Timer refreshTimer = new javax.swing.Timer(100, e -> scenePanel.repaint());
         refreshTimer.start();
 
         add(scenePanel);

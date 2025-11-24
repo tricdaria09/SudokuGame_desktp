@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.util.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.Timer;
 
 public class CafeManager {
     private int money;
@@ -14,19 +13,18 @@ public class CafeManager {
     private int cafeLevel;
     private int customers;
     private int satisfaction;
-    private Timer incomeTimer;
-    private Timer customerTimer;
+    private javax.swing.Timer incomeTimer;
+    private javax.swing.Timer customerTimer;
 
-    // 🏪 SISTEM DE UPGRADE-URI AVANSAT
     private Map<String, Integer> upgrades;
     private Map<String, Integer> upgradeCosts;
     private List<CafeObject> cafeObjects;
     private List<Customer> customersList;
-    private Timer customerSpawnTimer;
+    private javax.swing.Timer customerSpawnTimer;
     private int maxCustomers;
 
     public CafeManager() {
-        this.money = 500; // Mai mulți bani de start
+        this.money = 500;
         this.totalIncome = 0;
         this.gamesPlayed = 0;
         this.gamesWon = 0;
@@ -42,12 +40,10 @@ public class CafeManager {
         startCustomerSystem();
     }
 
-
     private void initializeUpgrades() {
         upgrades = new HashMap<>();
         upgradeCosts = new HashMap<>();
 
-        // ☕ UPGRADE-URI DE BAZĂ
         upgrades.put("coffee_quality", 1);
         upgrades.put("pastry_variety", 1);
         upgrades.put("service_speed", 1);
@@ -63,12 +59,10 @@ public class CafeManager {
 
     private void initializeCafeObjects() {
         cafeObjects = new ArrayList<>();
-        // Obiectele vor fi adăugate în CafeScene
     }
 
     private void startPassiveSystems() {
-        // 💰 SISTEM DE VENIT PASIV
-        incomeTimer = new Timer(10000, new ActionListener() {
+        incomeTimer = new javax.swing.Timer(10000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 generatePassiveIncome();
@@ -76,8 +70,7 @@ public class CafeManager {
         });
         incomeTimer.start();
 
-        // 👥 SISTEM DE CLIENTI
-        customerTimer = new Timer(15000, new ActionListener() {
+        customerTimer = new javax.swing.Timer(15000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 updateCustomers();
@@ -87,8 +80,7 @@ public class CafeManager {
     }
 
     private void startCustomerSystem() {
-        // 👥 SPAWN CLIENTI LA INTERVALE
-        customerSpawnTimer = new Timer(8000, new ActionListener() {
+        customerSpawnTimer = new javax.swing.Timer(8000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 spawnCustomer();
@@ -96,8 +88,7 @@ public class CafeManager {
         });
         customerSpawnTimer.start();
 
-        // 🔄 UPDATE CLIENTI EXISTENTI
-        Timer customerUpdateTimer = new Timer(100, new ActionListener() {
+        javax.swing.Timer customerUpdateTimer = new javax.swing.Timer(100, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 updateCustomersList();
@@ -108,14 +99,13 @@ public class CafeManager {
 
     private void generatePassiveIncome() {
         int hourlyIncome = getHourlyIncome();
-        int income = hourlyIncome / 360; // Venit la fiecare 10 secunde
+        int income = hourlyIncome / 360;
 
         money += income;
         totalIncome += income;
 
-        // 🎯 BONUS DE SATISFACTIE
         if (satisfaction > 80) {
-            money += (int)(income * 0.2); // +20% bonus pentru satisfacție mare
+            money += (int)(income * 0.2);
         }
     }
 
@@ -124,9 +114,7 @@ public class CafeManager {
         int change = calculateCustomerChange();
 
         customers += change;
-        customers = Math.max(3, Math.min(maxCustomers, customers)); // Limită între 3 și max
-
-        // 📈 ACTUALIZEAZĂ SATISFACTIA
+        customers = Math.max(3, Math.min(maxCustomers, customers));
         updateSatisfaction();
     }
 
@@ -141,13 +129,11 @@ public class CafeManager {
     }
 
     private void updateCustomersList() {
-        // 🔄 UPDATE TOȚI CLIENTII
         for (int i = customersList.size() - 1; i >= 0; i--) {
             Customer customer = customersList.get(i);
             customer.update();
 
             if (customer.shouldRemove()) {
-                // 💰 PRIMESTE BANI DACA CLIENTUL A PLECAT FERICIT
                 if (!customer.isAngry()) {
                     int spending = customer.calculateSpending();
                     money += spending;
@@ -160,29 +146,24 @@ public class CafeManager {
 
     private int calculateCustomerChange() {
         Random rand = new Random();
-        int baseChange = rand.nextInt(3) - 1; // -1, 0, sau +1
-
-        // 🎯 FACTORI CARE AFECTEAZĂ CLIENTII
-        double satisfactionEffect = (satisfaction - 50) / 100.0; // -0.5 to +0.5
-        double marketingEffect = upgrades.get("marketing") * 0.1; // +0.1 per level
+        int baseChange = rand.nextInt(3) - 1;
+        double satisfactionEffect = (satisfaction - 50) / 100.0;
+        double marketingEffect = upgrades.get("marketing") * 0.1;
 
         return baseChange + (int)(satisfactionEffect * 2) + (int)marketingEffect;
     }
 
     private void updateSatisfaction() {
         Random rand = new Random();
-        int change = rand.nextInt(5) - 2; // -2 to +2
-
-        // 🎯 FACTORI CARE AFECTEAZĂ SATISFACTIA
+        int change = rand.nextInt(5) - 2;
         int serviceBonus = upgrades.get("service_speed") * 3;
         int decorBonus = upgrades.get("decor") * 2;
 
         satisfaction += change + (serviceBonus + decorBonus) / 10;
-        satisfaction = Math.max(30, Math.min(100, satisfaction)); // Limită 30-100%
+        satisfaction = Math.max(30, Math.min(100, satisfaction));
     }
 
     private int getSpawnChance() {
-        // 🎯 SANSE MAI MARI CU MARKETING BUN
         int baseChance = 30;
         int marketingBonus = upgrades.get("marketing") * 5;
         int satisfactionBonus = satisfaction / 10;
@@ -190,44 +171,34 @@ public class CafeManager {
         return baseChance + marketingBonus + satisfactionBonus;
     }
 
-    // 🎮 METODE PENTRU JOCUL SUDOKU
     public void addGameResult(boolean won, int baseReward) {
         gamesPlayed++;
         if (won) {
             gamesWon++;
-
-            // 🎯 CALCULEAZĂ REWARD CU BONUSURI
             double qualityBonus = 1.0 + (upgrades.get("coffee_quality") * 0.1);
             double pastryBonus = 1.0 + (upgrades.get("pastry_variety") * 0.08);
             double satisfactionBonus = 1.0 + ((satisfaction - 50) * 0.01);
 
             int totalReward = (int)(baseReward * qualityBonus * pastryBonus * satisfactionBonus);
             money += totalReward;
-
-            // 🎉 BONUS CLIENTI PENTRU VICTORIE
             customers += 2;
             satisfaction = Math.min(100, satisfaction + 10);
         }
-
-        // 📈 ACTUALIZEAZĂ NIVELUL CAFENELEI
         updateCafeLevel();
     }
 
     private void updateCafeLevel() {
-        int newLevel = (gamesWon / 5) + 1; // Nivel nou la fiecare 5 victorii
+        int newLevel = (gamesWon / 5) + 1;
         cafeLevel = Math.max(cafeLevel, newLevel);
-        maxCustomers = 8 + (cafeLevel * 2); // Mai mulți clienți la nivel mai mare
+        maxCustomers = 8 + (cafeLevel * 2);
     }
 
-    // 🏪 METODE DE UPGRADE
     public boolean upgradeItem(String item) {
         int cost = upgradeCosts.get(item);
         if (money >= cost) {
             money -= cost;
             upgrades.put(item, upgrades.get(item) + 1);
-            upgradeCosts.put(item, (int)(cost * 1.6)); // Crește costul pentru următorul upgrade
-
-            // 🎯 BONUSURI LA UPGRADE
+            upgradeCosts.put(item, (int)(cost * 1.6));
             applyUpgradeEffects(item);
             return true;
         }
@@ -258,20 +229,15 @@ public class CafeManager {
     public void serveCustomer(Customer customer) {
         if (customersList.contains(customer)) {
             customer.serve();
-
-            // 🎯 BONUS SATISFACTIE PENTRU SERVIRE RAPIDA
             satisfaction = Math.min(100, satisfaction + 5);
-
-            // 💰 VENIT IMEDIAT
-            int spending = customer.calculateSpending() / 2; // Jumătate imediat
+            int spending = customer.calculateSpending() / 2;
             money += spending;
             totalIncome += spending;
         }
     }
 
-    // 📊 CALCULATOARE
     public int getHourlyIncome() {
-        int baseIncome = customers * 5; // Venit de bază de la clienți
+        int baseIncome = customers * 5;
         int upgradeBonus = upgrades.values().stream().mapToInt(Integer::intValue).sum() * 3;
         int customerBonus = customersList.size() * 2;
         return baseIncome + upgradeBonus + customerBonus;
@@ -295,7 +261,6 @@ public class CafeManager {
         return gamesPlayed == 0 ? 0 : (double) gamesWon / gamesPlayed * 100;
     }
 
-    // 🎯 GETTERS
     public int getMoney() { return money; }
     public int getTotalIncome() { return totalIncome; }
     public int getGamesPlayed() { return gamesPlayed; }
@@ -317,7 +282,6 @@ public class CafeManager {
     public boolean canAfford(int amount) { return money >= amount; }
     public void addMoney(int amount) { money += amount; }
 
-    // ☕ GETTERS PENTRU UPGRADE-URI SPECIFICE
     public int getCoffeeLevel() { return upgrades.get("coffee_quality"); }
     public int getPastryLevel() { return upgrades.get("pastry_variety"); }
     public int getServiceLevel() { return upgrades.get("service_speed"); }
@@ -332,7 +296,6 @@ public class CafeManager {
         return new ArrayList<>(cafeObjects);
     }
 
-    // 💰 METODĂ PENTRU AFIȘARE FORMATATĂ
     public String getFormattedMoney() {
         if (money >= 1000000) {
             return String.format("%.1fM", money / 1000000.0);

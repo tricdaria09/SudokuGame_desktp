@@ -1,14 +1,13 @@
 package com.sudokugame.ui;
 
-import com.sudokugame.game.Difficulty;
 import com.sudokugame.cafe.CafeManager;
+import com.sudokugame.game.Difficulty;
 import com.sudokugame.utils.AssetsLoader;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.geom.RoundRectangle2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class MainMeniu extends JFrame {
     private CafeManager cafeManager;
@@ -23,254 +22,175 @@ public class MainMeniu extends JFrame {
     private void initializeUI() {
         setTitle("Sudoku Cafe");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1024, 768);
+        setSize(800, 600);
         setLocationRelativeTo(null);
-        setResizable(false);
 
-        // 🖼️ PANEL CU BACKGROUND IMAGINE
         JPanel mainPanel = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
 
-                // ⬇️🖼️ BACKGROUND MENIU - SCHIMBĂ CU IMAGINEA TA!
-                Image background = AssetsLoader.getImage("menu_bg");
-                if (background != null) {
-                    g2d.drawImage(background, 0, 0, getWidth(), getHeight(), this);
-                } else {
-                    // Fallback gradient dacă imaginea nu există
-                    GradientPaint gradient = new GradientPaint(0, 0, new Color(74, 134, 232),
-                            0, getHeight(), new Color(142, 94, 242));
-                    g2d.setPaint(gradient);
-                    g2d.fillRect(0, 0, getWidth(), getHeight());
-                }
-
-                // Overlay semi-transparent pentru text readability
-                g2d.setColor(new Color(0, 0, 0, 100));
+                GradientPaint gradient = new GradientPaint(
+                        0, 0, AssetsLoader.getColor("menu_bg"),
+                        getWidth(), getHeight(), Color.WHITE
+                );
+                g2d.setPaint(gradient);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
             }
         };
 
-        // 🎯 HEADER CU STATS
-        JPanel headerPanel = createHeaderPanel();
-        mainPanel.add(headerPanel, BorderLayout.NORTH);
+        // Header
+        JPanel headerPanel = new JPanel(new FlowLayout());
+        headerPanel.setBackground(AssetsLoader.getColor("header_bg"));
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        // 🎮 PANEL BUTOANE PRINCIPALE
-        JPanel centerPanel = createCenterPanel();
-        mainPanel.add(centerPanel, BorderLayout.CENTER);
+        moneyLabel = new JLabel("💰 " + cafeManager.getMoney() + " coins");
+        cafeLevelLabel = new JLabel("🏪 Level " + cafeManager.getCafeLevel());
+
+        moneyLabel.setFont(AssetsLoader.getFont("header"));
+        cafeLevelLabel.setFont(AssetsLoader.getFont("header"));
+
+        headerPanel.add(moneyLabel);
+        headerPanel.add(cafeLevelLabel);
+
+        // Butoane
+        JPanel buttonPanel = new JPanel(new GridLayout(5, 1, 10, 10));
+        buttonPanel.setOpaque(false);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(50, 150, 50, 150));
+
+        JButton playButton = createButton("🎮 PLAY SUDOKU", AssetsLoader.getColor("button_primary"));
+        JButton cafeButton = createButton("🏪 MANAGE CAFE", Color.ORANGE);
+        JButton statsButton = createButton("📊 STATISTICS", Color.MAGENTA);
+        JButton settingsButton = createButton("⚙️ SETTINGS", Color.BLUE);
+        JButton exitButton = createButton("🚪 EXIT", Color.RED);
+
+        playButton.addActionListener(e -> showDifficultyMenu());
+        cafeButton.addActionListener(e -> showCafeMessage());
+        statsButton.addActionListener(e -> showStatistics());
+        settingsButton.addActionListener(e -> showSettings());
+        exitButton.addActionListener(e -> System.exit(0));
+
+        buttonPanel.add(playButton);
+        buttonPanel.add(cafeButton);
+        buttonPanel.add(statsButton);
+        buttonPanel.add(settingsButton);
+        buttonPanel.add(exitButton);
+
+        // Titlu
+        JLabel titleLabel = new JLabel("SUDOKU CAFE", SwingConstants.CENTER);
+        titleLabel.setFont(AssetsLoader.getFont("title"));
+        titleLabel.setForeground(new Color(139, 69, 19));
+
+        mainPanel.add(headerPanel, BorderLayout.NORTH);
+        mainPanel.add(titleLabel, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         add(mainPanel);
     }
 
-    private JPanel createHeaderPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setOpaque(false);
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
-
-        // 🏪 INFO CAFENEA
-        JPanel cafeInfoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
-        cafeInfoPanel.setOpaque(false);
-
-        moneyLabel = new JLabel("💰 " + cafeManager.getMoney() + " coins");
-        moneyLabel.setForeground(Color.WHITE);
-        moneyLabel.setFont(new Font("Arial", Font.BOLD, 20));
-
-        cafeLevelLabel = new JLabel("🏪 Level " + cafeManager.getCafeLevel());
-        cafeLevelLabel.setForeground(Color.YELLOW);
-        cafeLevelLabel.setFont(new Font("Arial", Font.BOLD, 20));
-
-        cafeInfoPanel.add(moneyLabel);
-        cafeInfoPanel.add(cafeLevelLabel);
-
-        // ⏰ STATS JOC
-        JPanel statsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
-        statsPanel.setOpaque(false);
-
-        JLabel gamesLabel = new JLabel("🎯 Games: " + cafeManager.getGamesPlayed());
-        JLabel winsLabel = new JLabel("🏆 Wins: " + cafeManager.getGamesWon());
-
-        gamesLabel.setForeground(Color.WHITE);
-        winsLabel.setForeground(Color.WHITE);
-        gamesLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        winsLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-
-        statsPanel.add(gamesLabel);
-        statsPanel.add(winsLabel);
-
-        panel.add(cafeInfoPanel, BorderLayout.WEST);
-        panel.add(statsPanel, BorderLayout.EAST);
-
-        return panel;
-    }
-
-    private JPanel createCenterPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setOpaque(false);
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(15, 100, 15, 100);
-
-        // 🎮 TITLU
-        JLabel titleLabel = new JLabel("SUDOKU CAFE", SwingConstants.CENTER);
-        titleLabel.setForeground(Color.WHITE);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 64));
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 40, 0));
-        panel.add(titleLabel, gbc);
-
-        // 🎯 BUTOANE PRINCIPALE
-        panel.add(createMenuButton("🎮 PLAY SUDOKU", new Color(76, 175, 80), e -> showGameMenu()), gbc);
-        panel.add(createMenuButton("🏪 MANAGE CAFE", new Color(255, 152, 0), e -> showCafeScene()), gbc);
-        panel.add(createMenuButton("📊 STATISTICS", new Color(156, 39, 176), e -> showStatistics()), gbc);
-        panel.add(createMenuButton("⚙️ SETTINGS", new Color(33, 150, 243), e -> showSettings()), gbc);
-        panel.add(createMenuButton("🚪 EXIT", new Color(244, 67, 54), e -> exitGame()), gbc);
-
-        return panel;
-    }
-
-    private JButton createMenuButton(String text, Color color, java.awt.event.ActionListener action) {
-        JButton button = new JButton(text) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                // Buton modern cu gradient
-                GradientPaint gradient = new GradientPaint(0, 0, color, 0, getHeight(), color.darker());
-                g2.setPaint(gradient);
-                g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 25, 25));
-
-                // Border
-                g2.setColor(new Color(255, 255, 255, 100));
-                g2.setStroke(new BasicStroke(2));
-                g2.draw(new RoundRectangle2D.Float(1, 1, getWidth()-2, getHeight()-2, 25, 25));
-
-                // Text
-                g2.setColor(Color.WHITE);
-                g2.setFont(new Font("Arial", Font.BOLD, 24));
-                FontMetrics fm = g2.getFontMetrics();
-                int x = (getWidth() - fm.stringWidth(getText())) / 2;
-                int y = (getHeight() + fm.getAscent()) / 2 - 2;
-                g2.drawString(getText(), x, y);
-            }
-        };
-
-        button.setPreferredSize(new Dimension(350, 70));
-        button.setBorder(BorderFactory.createEmptyBorder());
-        button.setContentAreaFilled(false);
+    private JButton createButton(String text, Color color) {
+        JButton button = new JButton(text);
+        button.setFont(AssetsLoader.getFont("button"));
+        button.setBackground(color);
+        button.setForeground(Color.BLACK);
         button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // Efecte hover
-        button.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                button.repaint();
+        // Efect hover
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(color.darker());
             }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                button.repaint();
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(color);
             }
         });
 
-        button.addActionListener(action);
         return button;
     }
 
-    private void showGameMenu() {
-        JPopupMenu difficultyMenu = new JPopupMenu();
+    private void showDifficultyMenu() {
+        String[] options = {"Easy (25 coins)", "Medium (50 coins)", "Hard (100 coins)"};
+        String choice = (String) JOptionPane.showInputDialog(
+                this,
+                "Choose difficulty:",
+                "Start Game",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
 
-        JMenuItem easy = new JMenuItem("🎮 Easy - 25 coins");
-        JMenuItem medium = new JMenuItem("🎮 Medium - 50 coins");
-        JMenuItem hard = new JMenuItem("🎮 Hard - 100 coins");
+        if (choice != null) {
+            Difficulty difficulty = null;
+            int cost = 0;
 
-        easy.addActionListener(e -> startGame(Difficulty.EASY));
-        medium.addActionListener(e -> startGame(Difficulty.MEDIUM));
-        hard.addActionListener(e -> startGame(Difficulty.HARD));
+            if (choice.contains("Easy")) {
+                difficulty = Difficulty.EASY;
+                cost = 25;
+            } else if (choice.contains("Medium")) {
+                difficulty = Difficulty.MEDIUM;
+                cost = 50;
+            } else if (choice.contains("Hard")) {
+                difficulty = Difficulty.HARD;
+                cost = 100;
+            }
 
-        difficultyMenu.add(easy);
-        difficultyMenu.add(medium);
-        difficultyMenu.add(hard);
-
-        // 🎯 AFIȘEAZĂ MENIUL ÎN CENTRU
-        difficultyMenu.show(this, getWidth()/2 - 100, getHeight()/2);
+            if (difficulty != null) {
+                startSudokuGame(difficulty, cost);
+            }
+        }
     }
 
-    private void startGame(Difficulty difficulty) {
-        // Verifică dacă player-ul are suficienți bani
-        int cost = 0;
-        switch (difficulty) {
-            case EASY: cost = 25; break;
-            case MEDIUM: cost = 50; break;
-            case HARD: cost = 100; break;
-        }
-
-        if (cafeManager.canAfford(cost)) {
-            cafeManager.addMoney(-cost);
-
-            // 🎮 DESCHIDE JOCUL SUDOKU
-            SudokuGamePanel gamePanel = new SudokuGamePanel(this, cafeManager, difficulty);
-            gamePanel.setVisible(true);
-            this.setVisible(false);
-            updateDisplay();
-        } else {
+    private void startSudokuGame(Difficulty difficulty, int cost) {
+        if (!cafeManager.canAfford(cost)) {
             JOptionPane.showMessageDialog(this,
-                    "❌ Not enough coins to play!\n" +
-                            "💰 Need: " + cost + " coins\n" +
-                            "💡 Earn more coins by managing your cafe!",
+                    "Not enough coins! Need: " + cost + " coins",
                     "Insufficient Funds",
                     JOptionPane.WARNING_MESSAGE);
+            return;
         }
+
+        cafeManager.addMoney(-cost);
+        updateDisplay();
+
+        // Ascunde meniul principal
+        setVisible(false);
+
+        // Creează fereastra de joc Sudoku
+        SudokuGamePanel gamePanel = new SudokuGamePanel(this, cafeManager, difficulty);
+        gamePanel.setVisible(true);
     }
 
-    private void showCafeScene() {
-        CafeScene cafeScene = new CafeScene(this, cafeManager);
-        cafeScene.setVisible(true);
-        this.setVisible(false);
+    private void showCafeMessage() {
+        JOptionPane.showMessageDialog(this,
+                "🏪 Cafe Management\n\n" +
+                        "This feature will be available\n" +
+                        "in the next update!",
+                "Coming Soon",
+                JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void showStatistics() {
         JOptionPane.showMessageDialog(this,
-                "📊 Cafe Statistics:\n\n" +
-                        "💰 Total Money: " + cafeManager.getMoney() + " coins\n" +
-                        "🏪 Cafe Level: " + cafeManager.getCafeLevel() + "\n" +
-                        "😊 Satisfaction: " + cafeManager.getSatisfaction() + "%\n" +
-                        "👥 Customers: " + cafeManager.getCustomers() + "\n" +
-                        "📈 Hourly Income: " + cafeManager.getHourlyIncome() + " coins\n" +
-                        "🎯 Games Played: " + cafeManager.getGamesPlayed() + "\n" +
-                        "🏆 Games Won: " + cafeManager.getGamesWon() + "\n" +
-                        "⭐ Win Rate: " + String.format("%.1f", cafeManager.getWinRate()) + "%\n\n" +
-                        "☕ Upgrades:\n" +
-                        "  • Coffee Quality: Level " + cafeManager.getCoffeeLevel() + "\n" +
-                        "  • Pastry Variety: Level " + cafeManager.getPastryLevel() + "\n" +
-                        "  • Service Speed: Level " + cafeManager.getServiceLevel() + "\n" +
-                        "  • Decor: Level " + cafeManager.getDecorLevel() + "\n" +
-                        "  • Marketing: Level " + cafeManager.getMarketingLevel(),
-                "Cafe Statistics",
+                "📊 Statistics:\n\n" +
+                        "Money: " + cafeManager.getMoney() + " coins\n" +
+                        "Cafe Level: " + cafeManager.getCafeLevel() + "\n" +
+                        "Games Played: " + cafeManager.getGamesPlayed() + "\n" +
+                        "Games Won: " + cafeManager.getGamesWon() + "\n" +
+                        "Win Rate: " + String.format("%.1f", cafeManager.getWinRate()) + "%",
+                "Game Statistics",
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void showSettings() {
         JOptionPane.showMessageDialog(this,
                 "⚙️ Settings\n\n" +
-                        "Game settings will be available\n" +
-                        "in a future update!",
+                        "No settings available yet.",
                 "Settings",
                 JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    private void exitGame() {
-        int response = JOptionPane.showConfirmDialog(this,
-                "Are you sure you want to exit?",
-                "Exit Game",
-                JOptionPane.YES_NO_OPTION);
-
-        if (response == JOptionPane.YES_OPTION) {
-            System.exit(0);
-        }
     }
 
     public void updateDisplay() {

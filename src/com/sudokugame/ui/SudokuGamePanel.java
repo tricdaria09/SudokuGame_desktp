@@ -22,7 +22,6 @@ public class SudokuGamePanel extends JFrame {
     private int hearts;
     private int maxHearts;
     private JPanel heartsPanel;
-    private JLabel heartsLabel;
 
     private JLabel timerLabel;
     private JLabel difficultyLabel;
@@ -47,38 +46,33 @@ public class SudokuGamePanel extends JFrame {
 
     private int getMaxHeartsForDifficulty() {
         switch (difficulty) {
-            case EASY: return 5;   // 5 inimi pentru ușor
-            case MEDIUM: return 3; // 3 inimi pentru mediu
-            case HARD: return 2;   // 2 inimi pentru greu
+            case EASY: return 5;
+            case MEDIUM: return 3;
+            case HARD: return 2;
             default: return 3;
         }
     }
 
     private void initializeUI() {
-        setTitle("Sudoku - " + difficulty.getName() + " ❤️" + hearts);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(900, 1000);
+        setTitle("Sudoku - " + difficulty.getName());
+        setSize(800, 900);
         setLocationRelativeTo(null);
         setResizable(false);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        // 🖼️ BACKGROUND JOC MODERN
+        // 🎨 BACKGROUND CU CULORILE NOASTRE
         JPanel mainPanel = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
 
-                // ⬇️🖼️ BACKGROUND JOC SUDOKU - SCHIMBĂ "game_bg.jpg" CU IMAGINEA TA!
-                Image background = AssetsLoader.getImage("game_bg");
-                if (background != null) {
-                    g2d.drawImage(background, 0, 0, getWidth(), getHeight(), this);
-                } else {
-                    // Fallback gradient modern
-                    GradientPaint gradient = new GradientPaint(0, 0, new Color(240, 248, 255),
-                            0, getHeight(), new Color(230, 240, 250));
-                    g2d.setPaint(gradient);
-                    g2d.fillRect(0, 0, getWidth(), getHeight());
-                }
+                GradientPaint gradient = new GradientPaint(
+                        0, 0, AssetsLoader.getColor("menu_bg"),
+                        getWidth(), getHeight(), AssetsLoader.getColor("game_bg")
+                );
+                g2d.setPaint(gradient);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
             }
         };
 
@@ -99,65 +93,92 @@ public class SudokuGamePanel extends JFrame {
 
     private JPanel createHeaderPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(50, 50, 50, 200));
-        panel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
+        panel.setBackground(AssetsLoader.getColor("header_bg"));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        panel.setPreferredSize(new Dimension(getWidth(), 80));
+
+        // 🎯 RÂND SUPERIOR: TIMER + INIMI
+        JPanel topRow = new JPanel(new BorderLayout());
+        topRow.setOpaque(false);
 
         // ⏰ TIMER
         timerLabel = new JLabel("00:00");
-        timerLabel.setForeground(Color.WHITE);
-        timerLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        timerLabel.setForeground(Color.BLACK);
+        timerLabel.setFont(new Font("Arial", Font.BOLD, 20));
 
-        // 🎯 DIFICULTATE
-        difficultyLabel = new JLabel(difficulty.getName() + " | ❤️ " + hearts + "/" + maxHearts);
-        difficultyLabel.setForeground(difficulty.getColor());
-        difficultyLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        difficultyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        // ❤️ INIMI - CREATĂ PRIMUL
+        heartsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+        heartsPanel.setOpaque(false);
+        heartsPanel.setPreferredSize(new Dimension(200, 25));
+        updateHeartsDisplay(); // ACUM heartsPanel NU MAI E NULL
 
         // 💰 MONEDE
-        coinsLabel = new JLabel("💰 " + cafeManager.getMoney() + " coins");
-        coinsLabel.setForeground(Color.YELLOW);
-        coinsLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        coinsLabel = new JLabel("💰 " + cafeManager.getMoney());
+        coinsLabel.setForeground(Color.BLACK);
+        coinsLabel.setFont(new Font("Arial", Font.BOLD, 16));
 
-        panel.add(timerLabel, BorderLayout.WEST);
-        panel.add(difficultyLabel, BorderLayout.CENTER);
-        panel.add(coinsLabel, BorderLayout.EAST);
+        topRow.add(timerLabel, BorderLayout.WEST);
+        topRow.add(heartsPanel, BorderLayout.CENTER);
+        topRow.add(coinsLabel, BorderLayout.EAST);
+
+        // 🎯 RÂND INFERIOR: DIFICULTATE
+        difficultyLabel = new JLabel(difficulty.getName(), SwingConstants.CENTER);
+        difficultyLabel.setForeground(difficulty.getColor());
+        difficultyLabel.setFont(new Font("Arial", Font.BOLD, 16));
+
+        panel.add(topRow, BorderLayout.NORTH);
+        panel.add(difficultyLabel, BorderLayout.SOUTH);
 
         return panel;
     }
 
+    private void updateHeartsDisplay() {
+        if (heartsPanel == null) return; // PROTECȚIE ÎMPOTRIVA NULL
+
+        heartsPanel.removeAll();
+
+        for (int i = 0; i < hearts; i++) {
+            JLabel heart = new JLabel("❤️");
+            heart.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20));
+            heartsPanel.add(heart);
+        }
+
+        for (int i = hearts; i < maxHearts; i++) {
+            JLabel heart = new JLabel("🤍");
+            heart.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20));
+            heartsPanel.add(heart);
+        }
+
+        heartsPanel.revalidate();
+        heartsPanel.repaint();
+    }
+
     private JPanel createSudokuGrid() {
-        // 🎯 GRID CU LINII ACCENTUATE
-        sudokuGrid = new JPanel(new GridLayout(9, 9, 1, 1)) {
+        sudokuGrid = new JPanel(new GridLayout(9, 9, 0, 0)) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
 
-                // 🎯 LINII GROASE PENTRU GRUPURILE 3x3 - ACCENTUATE!
-                g2d.setColor(new Color(0, 0, 0, 200));
-                g2d.setStroke(new BasicStroke(4)); // LINII MAI GROASE
+                g2d.setColor(new Color(0, 0, 0));
+                g2d.setStroke(new BasicStroke(3));
 
                 for (int i = 1; i < 3; i++) {
-                    // Linii verticale groase
                     int x = i * getWidth() / 3;
                     g2d.drawLine(x, 0, x, getHeight());
 
-                    // Linii orizontale groase
                     int y = i * getHeight() / 3;
                     g2d.drawLine(0, y, getWidth(), y);
                 }
 
-                // 🎯 LINII SUBȚIRI PENTRU CELULE
-                g2d.setColor(new Color(0, 0, 0, 100));
+                g2d.setColor(new Color(200, 200, 200));
                 g2d.setStroke(new BasicStroke(1));
 
                 for (int i = 1; i < 9; i++) {
-                    if (i % 3 != 0) { // Doar liniile dintre celulele mici
-                        // Linii verticale subțiri
+                    if (i % 3 != 0) {
                         int x = i * getWidth() / 9;
                         g2d.drawLine(x, 0, x, getHeight());
 
-                        // Linii orizontale subțiri
                         int y = i * getHeight() / 9;
                         g2d.drawLine(0, y, getWidth(), y);
                     }
@@ -165,9 +186,9 @@ public class SudokuGamePanel extends JFrame {
             }
         };
 
-        sudokuGrid.setBackground(Color.BLACK);
-        sudokuGrid.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        sudokuGrid.setPreferredSize(new Dimension(600, 600));
+        sudokuGrid.setBackground(Color.WHITE);
+        sudokuGrid.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        sudokuGrid.setPreferredSize(new Dimension(500, 500));
 
         cells = new SudokuCell[9][9];
         int[][] board = engine.getBoard();
@@ -182,7 +203,6 @@ public class SudokuGamePanel extends JFrame {
         return sudokuGrid;
     }
 
-    // 🎯 CLASA INTERNĂ PENTRU CELULE SUDOKU (IMBUNĂTĂȚITĂ)
     private class SudokuCell extends JPanel {
         private int row, col, value;
         private boolean isFixed, isSelected, isError;
@@ -195,7 +215,7 @@ public class SudokuGamePanel extends JFrame {
             this.isSelected = false;
             this.isError = false;
 
-            setPreferredSize(new Dimension(60, 60));
+            setPreferredSize(new Dimension(50, 50));
             setCursor(new Cursor(Cursor.HAND_CURSOR));
 
             addMouseListener(new MouseAdapter() {
@@ -212,28 +232,59 @@ public class SudokuGamePanel extends JFrame {
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            // 🖼️ BACKGROUND CELULĂ - SCHIMBĂ "cell_normal.png" CU IMAGINEA TA!
-            Image cellImage = AssetsLoader.getImage("cell_normal");
-            if (cellImage != null) {
-                g2d.drawImage(cellImage, 0, 0, getWidth(), getHeight(), this);
-            } else {
-                // Fallback la culori
-                if (isSelected) {
-                    g2d.setColor(new Color(100, 180, 255, 150));
-                } else if (isError) {
-                    g2d.setColor(new Color(255, 100, 100, 120));
-                } else {
-                    // Pattern pentru grupurile 3x3
-                    boolean isLight = ((row / 3) + (col / 3)) % 2 == 0;
-                    g2d.setColor(isLight ? new Color(240, 240, 240) : new Color(220, 220, 220));
+            g2d.setColor(Color.WHITE);
+            g2d.fillRect(0, 0, getWidth(), getHeight());
+
+            if (isSelected) {
+                g2d.setColor(AssetsLoader.getColor("cell_selected"));
+                for (int c = 0; c < 9; c++) {
+                    if (c != col) {
+                        g2d.fillRect(c * getWidth(), 0, getWidth(), getHeight());
+                    }
                 }
+
+                for (int r = 0; r < 9; r++) {
+                    if (r != row) {
+                        g2d.fillRect(0, r * getHeight(), getWidth(), getHeight());
+                    }
+                }
+
+                int startRow = row - row % 3;
+                int startCol = col - col % 3;
+                g2d.setColor(new Color(220, 240, 255));
+                for (int r = startRow; r < startRow + 3; r++) {
+                    for (int c = startCol; c < startCol + 3; c++) {
+                        if (r != row || c != col) {
+                            g2d.fillRect(c * getWidth(), r * getHeight(), getWidth(), getHeight());
+                        }
+                    }
+                }
+
+                g2d.setColor(new Color(0, 100, 255));
+                g2d.setStroke(new BasicStroke(2));
+                g2d.drawRect(1, 1, getWidth()-2, getHeight()-2);
+            }
+
+            if (isFixed) {
+                g2d.setColor(new Color(240, 240, 240));
                 g2d.fillRect(0, 0, getWidth(), getHeight());
             }
 
-            // ✏️ TEXT
+            if (isError) {
+                g2d.setColor(AssetsLoader.getColor("cell_error"));
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+            }
+
             if (value != 0) {
-                g2d.setColor(isFixed ? new Color(0, 0, 139) : Color.BLACK); // Albastru închis pentru numere fixe
-                g2d.setFont(new Font("Arial", isFixed ? Font.BOLD : Font.PLAIN, 22));
+                if (isError) {
+                    g2d.setColor(Color.RED);
+                } else if (isFixed) {
+                    g2d.setColor(Color.BLACK);
+                } else {
+                    g2d.setColor(new Color(0, 100, 200));
+                }
+
+                g2d.setFont(new Font("Arial", Font.BOLD, 20));
 
                 FontMetrics fm = g2d.getFontMetrics();
                 String text = String.valueOf(value);
@@ -243,81 +294,27 @@ public class SudokuGamePanel extends JFrame {
                 g2d.drawString(text, x, y);
             }
 
-            // 🎯 LINII DE ORIENTARE CÂND E SELECTAT
-            if (isSelected) {
-                g2d.setColor(new Color(0, 100, 255, 100));
-                g2d.setStroke(new BasicStroke(3));
-                g2d.drawRect(1, 1, getWidth()-2, getHeight()-2);
-
-                // 🎯 HIGHLIGHT LINIE ȘI COLOANĂ
-                highlightRowAndColumn(g2d);
-            }
-        }
-
-        private void highlightRowAndColumn(Graphics2D g2d) {
-            // 🎯 HIGHLIGHT TOATĂ LINIA (orizontal)
-            g2d.setColor(new Color(100, 180, 255, 50));
-            for (int c = 0; c < 9; c++) {
-                if (c != col) {
-                    int cellWidth = getWidth();
-                    int cellHeight = getHeight();
-                    g2d.fillRect(c * cellWidth, 0, cellWidth, cellHeight);
-                }
-            }
-
-            // 🎯 HIGHLIGHT TOATĂ COLOANA (vertical)
-            for (int r = 0; r < 9; r++) {
-                if (r != row) {
-                    int cellWidth = getWidth();
-                    int cellHeight = getHeight();
-                    g2d.fillRect(0, r * cellHeight, cellWidth, cellHeight);
-                }
-            }
-
-            // 🎯 HIGHLIGHT GRUPUL 3x3
-            int startRow = row - row % 3;
-            int startCol = col - col % 3;
-            g2d.setColor(new Color(100, 180, 255, 30));
-            for (int r = startRow; r < startRow + 3; r++) {
-                for (int c = startCol; c < startCol + 3; c++) {
-                    if (r != row || c != col) {
-                        int cellWidth = getWidth();
-                        int cellHeight = getHeight();
-                        g2d.fillRect(c * cellWidth, r * cellHeight, cellWidth, cellHeight);
-                    }
-                }
-            }
+            g2d.setColor(new Color(200, 200, 200));
+            g2d.setStroke(new BasicStroke(1));
+            g2d.drawRect(0, 0, getWidth()-1, getHeight()-1);
         }
 
         private void selectCell() {
-            // Deselectează celula precedentă
-            if (selectedRow != -1 && selectedCol != -1) {
-                cells[selectedRow][selectedCol].isSelected = false;
-                cells[selectedRow][selectedCol].repaint();
+            for (int r = 0; r < 9; r++) {
+                for (int c = 0; c < 9; c++) {
+                    cells[r][c].isSelected = false;
+                }
             }
 
-            // Selectează celula nouă doar dacă nu e fixă
             if (!isFixed) {
                 isSelected = true;
                 selectedRow = row;
                 selectedCol = col;
-                repaint();
+            }
 
-                // 🎯 REPAINT TOATĂ LINIA ȘI COLOANA PENTRU HIGHLIGHT
-                for (int i = 0; i < 9; i++) {
-                    if (i != col) cells[row][i].repaint();
-                    if (i != row) cells[i][col].repaint();
-                }
-
-                // 🎯 REPAINT GRUPUL 3x3
-                int startRow = row - row % 3;
-                int startCol = col - col % 3;
-                for (int r = startRow; r < startRow + 3; r++) {
-                    for (int c = startCol; c < startCol + 3; c++) {
-                        if (r != row || c != col) {
-                            cells[r][c].repaint();
-                        }
-                    }
+            for (int r = 0; r < 9; r++) {
+                for (int c = 0; c < 9; c++) {
+                    cells[r][c].repaint();
                 }
             }
         }
@@ -327,11 +324,10 @@ public class SudokuGamePanel extends JFrame {
                 this.value = newValue;
                 engine.setCellValue(row, col, newValue);
 
-                // 🎯 VERIFICĂ DACA VALOAREA ESTE CORECTĂ
                 if (newValue != 0) {
                     boolean isCorrect = (newValue == engine.getSolutionValue(row, col));
                     if (!isCorrect) {
-                        loseHeart(); // 🎯 PIERDE O INIMĂ PENTRU GREȘEALĂ
+                        loseHeart();
                     }
                     isError = !isCorrect;
                 } else {
@@ -347,31 +343,18 @@ public class SudokuGamePanel extends JFrame {
         }
     }
 
-    // 🎯 SISTEM DE INIMI
     private void loseHeart() {
         hearts--;
         updateHeartsDisplay();
 
-        // 🎯 ACTUALIZEAZĂ TITLUL FEREASTREI
-        setTitle("Sudoku - " + difficulty.getName() + " ❤️" + hearts + "/" + maxHearts);
-        difficultyLabel.setText(difficulty.getName() + " | ❤️ " + hearts + "/" + maxHearts);
-
-        // 🎯 VERIFICĂ DACA JOCUL S-A TERMINAT
         if (hearts <= 0) {
             gameOver();
         } else {
-            // 🎯 ANIMAȚIE SCĂDERE INIMI
             showHeartLossAnimation();
         }
     }
 
-    private void updateHeartsDisplay() {
-        // 🎯 ACTUALIZEAZĂ AFIȘAJUL INIMILOR
-        difficultyLabel.setText(difficulty.getName() + " | ❤️ " + hearts + "/" + maxHearts);
-    }
-
     private void showHeartLossAnimation() {
-        // 🎯 ANIMAȚIE SCĂDERE INIMI
         Timer heartTimer = new Timer(100, new ActionListener() {
             int flashCount = 0;
             @Override
@@ -381,29 +364,24 @@ public class SudokuGamePanel extends JFrame {
                 if (flashCount > 6) {
                     difficultyLabel.setForeground(difficulty.getColor());
                     ((Timer)e.getSource()).stop();
+
+                    JOptionPane.showMessageDialog(SudokuGamePanel.this,
+                            "💔 Wrong number!\n❤️ You lost one heart!\nHearts remaining: " + hearts + "/" + maxHearts,
+                            "Incorrect Move",
+                            JOptionPane.WARNING_MESSAGE);
                 }
             }
         });
         heartTimer.start();
-
-        JOptionPane.showMessageDialog(this,
-                "💔 Wrong number!\n" +
-                        "❤️ You lost one heart!\n" +
-                        "Hearts remaining: " + hearts + "/" + maxHearts,
-                "Incorrect Move",
-                JOptionPane.WARNING_MESSAGE);
     }
 
     private void gameOver() {
-        gameTimer.stop();
+        if (gameTimer != null) {
+            gameTimer.stop();
+        }
 
         JOptionPane.showMessageDialog(this,
-                "💔 GAME OVER!\n\n" +
-                        "⏱️ Time: " + timerLabel.getText() + "\n" +
-                        "❤️ Hearts: 0/" + maxHearts + "\n" +
-                        "🎯 Difficulty: " + difficulty.getName() + "\n\n" +
-                        "You ran out of hearts!\n" +
-                        "Better luck next time!",
+                "💔 GAME OVER!\n\n⏱️ Time: " + timerLabel.getText() + "\n❤️ Hearts: 0/" + maxHearts + "\n🎯 Difficulty: " + difficulty.getName(),
                 "Game Over",
                 JOptionPane.ERROR_MESSAGE);
 
@@ -412,37 +390,37 @@ public class SudokuGamePanel extends JFrame {
 
     private JPanel createControlPanel() {
         JPanel panel = new JPanel(new FlowLayout());
-        panel.setBackground(new Color(0, 0, 0, 150));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        panel.setBackground(AssetsLoader.getColor("control_bg"));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 
-        // 🎯 BUTOANE MODERNE
-        panel.add(createControlButton("✅ Check", new Color(76, 175, 80), e -> checkSolution()));
-        panel.add(createControlButton("💡 Hint (25¢)", new Color(255, 152, 0), e -> showHint()));
-        panel.add(createControlButton("🔍 Solve", new Color(156, 39, 176), e -> showSolution()));
-        panel.add(createControlButton("🔄 New Game", new Color(33, 150, 243), e -> newGame()));
-        panel.add(createControlButton("🏠 Menu", new Color(244, 67, 54), e -> returnToMenu()));
+        panel.add(createControlButton("Check", new Color(76, 175, 80), e -> checkSolution()));
+        panel.add(createControlButton("Hint (25¢)", new Color(255, 152, 0), e -> showHint()));
+        panel.add(createControlButton("Solve", new Color(156, 39, 176), e -> showSolution()));
+        panel.add(createControlButton("New Game", new Color(33, 150, 243), e -> newGame()));
+        panel.add(createControlButton("Menu", new Color(244, 67, 54), e -> returnToMenu()));
 
         return panel;
     }
 
     private JPanel createNumberPanel() {
-        JPanel panel = new JPanel(new GridLayout(0, 1, 5, 5));
-        panel.setBackground(new Color(0, 0, 0, 100));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 20));
-        panel.setPreferredSize(new Dimension(100, 600));
+        JPanel panel = new JPanel(new GridLayout(0, 1, 2, 2));
+        panel.setBackground(AssetsLoader.getColor("control_bg"));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
+        panel.setPreferredSize(new Dimension(80, 500));
 
         for (int i = 1; i <= 9; i++) {
             JButton numberBtn = new JButton(String.valueOf(i));
-            numberBtn.setFont(new Font("Arial", Font.BOLD, 20));
-            numberBtn.setBackground(new Color(70, 130, 180));
-            numberBtn.setForeground(Color.WHITE);
+            numberBtn.setFont(new Font("Arial", Font.BOLD, 18));
+            numberBtn.setBackground(AssetsLoader.getColor("button_primary"));
+            numberBtn.setForeground(Color.BLACK);
             numberBtn.setFocusPainted(false);
+            numberBtn.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
             numberBtn.addActionListener(e -> inputNumber(Integer.parseInt(numberBtn.getText())));
             panel.add(numberBtn);
         }
 
-        JButton clearBtn = new JButton("✕");
-        clearBtn.setFont(new Font("Arial", Font.BOLD, 20));
+        JButton clearBtn = new JButton("Clear");
+        clearBtn.setFont(new Font("Arial", Font.BOLD, 14));
         clearBtn.setBackground(Color.RED);
         clearBtn.setForeground(Color.WHITE);
         clearBtn.addActionListener(e -> inputNumber(0));
@@ -452,31 +430,12 @@ public class SudokuGamePanel extends JFrame {
     }
 
     private JButton createControlButton(String text, Color color, ActionListener action) {
-        JButton button = new JButton(text) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                // Buton modern cu gradient
-                GradientPaint gradient = new GradientPaint(0, 0, color, 0, getHeight(), color.darker());
-                g2.setPaint(gradient);
-                g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 15, 15));
-
-                // Text
-                g2.setColor(Color.WHITE);
-                g2.setFont(new Font("Arial", Font.BOLD, 14));
-                FontMetrics fm = g2.getFontMetrics();
-                int x = (getWidth() - fm.stringWidth(getText())) / 2;
-                int y = (getHeight() + fm.getAscent()) / 2 - 2;
-                g2.drawString(getText(), x, y);
-            }
-        };
-
-        button.setPreferredSize(new Dimension(120, 45));
-        button.setBorder(BorderFactory.createEmptyBorder());
-        button.setContentAreaFilled(false);
+        JButton button = new JButton(text);
+        button.setFont(new Font("Arial", Font.BOLD, 12));
+        button.setBackground(color);
+        button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.addActionListener(action);
 
@@ -517,8 +476,7 @@ public class SudokuGamePanel extends JFrame {
         } else {
             highlightErrors();
             JOptionPane.showMessageDialog(this,
-                    "❌ Not quite right!\n" +
-                            "Check the red cells for errors.",
+                    "❌ Not quite right!\nCheck the red cells for errors.",
                     "Solution Check",
                     JOptionPane.WARNING_MESSAGE);
         }
@@ -535,7 +493,6 @@ public class SudokuGamePanel extends JFrame {
     }
 
     private void showVictoryAnimation() {
-        // 🎉 ANIMAȚIE VICTORIE
         Timer victoryTimer = new Timer(100, new ActionListener() {
             int flashCount = 0;
             @Override
@@ -557,19 +514,11 @@ public class SudokuGamePanel extends JFrame {
 
     private void showVictoryMessage() {
         int reward = difficulty.getBaseReward() + cafeManager.getCafeBonus();
-
-        // 🎯 BONUS PENTRU INIMILE RĂMASE
         int heartBonus = hearts * 10;
         reward += heartBonus;
 
         JOptionPane.showMessageDialog(this,
-                "🎉 CONGRATULATIONS!\n\n" +
-                        "⏱️ Time: " + timerLabel.getText() + "\n" +
-                        "❤️ Hearts remaining: " + hearts + "/" + maxHearts + " (+" + heartBonus + " coins)\n" +
-                        "💰 Total Reward: " + reward + " coins\n" +
-                        "🏪 Cafe Bonus: +" + cafeManager.getCafeBonus() + " coins\n" +
-                        "⭐ Difficulty: " + difficulty.getName() + "\n\n" +
-                        "Your cafe has earned extra income!",
+                "🎉 CONGRATULATIONS!\n\n⏱️ Time: " + timerLabel.getText() + "\n❤️ Hearts remaining: " + hearts + "/" + maxHearts + " (+" + heartBonus + " coins)\n💰 Total Reward: " + reward + " coins",
                 "Puzzle Complete!",
                 JOptionPane.INFORMATION_MESSAGE);
 
@@ -581,17 +530,15 @@ public class SudokuGamePanel extends JFrame {
             cafeManager.addMoney(-25);
             engine.provideHint();
             updateBoardDisplay();
-            coinsLabel.setText("💰 " + cafeManager.getMoney() + " coins");
+            coinsLabel.setText("💰 " + cafeManager.getMoney());
 
             JOptionPane.showMessageDialog(this,
-                    "💡 Hint applied!\n" +
-                            "One cell has been filled for you.",
+                    "💡 Hint applied!\nOne cell has been filled for you.",
                     "Hint Used",
                     JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(this,
-                    "❌ Not enough coins for hint!\n" +
-                            "Need: 25 coins",
+                    "❌ Not enough coins for hint!\nNeed: 25 coins",
                     "Insufficient Funds",
                     JOptionPane.WARNING_MESSAGE);
         }
@@ -599,8 +546,7 @@ public class SudokuGamePanel extends JFrame {
 
     private void showSolution() {
         int response = JOptionPane.showConfirmDialog(this,
-                "Are you sure you want to see the solution?\n" +
-                        "This will end the current game.",
+                "Are you sure you want to see the solution?\nThis will end the current game.",
                 "Show Solution",
                 JOptionPane.YES_NO_OPTION);
 
@@ -613,8 +559,7 @@ public class SudokuGamePanel extends JFrame {
 
     private void newGame() {
         int response = JOptionPane.showConfirmDialog(this,
-                "Start a new game?\n" +
-                        "Current progress will be lost.",
+                "Start a new game?\nCurrent progress will be lost.",
                 "New Game",
                 JOptionPane.YES_NO_OPTION);
 
