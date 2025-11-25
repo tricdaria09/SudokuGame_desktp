@@ -53,27 +53,19 @@ public class SudokuGamePanel extends JFrame {
 
     private void initializeUI() {
         setTitle("Sudoku - " + difficulty.getName());
-        setSize(700, 800);
+        setSize(800, 900); // Mărim fereastra
         setLocationRelativeTo(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+        // FUNDAL ÎNCHIS PENTRU CONTRAST
         JPanel mainPanel = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
-                Image background = AssetsLoader.getImage("game_bg");
-                if (background != null) {
-                    g2d.drawImage(background, 0, 0, getWidth(), getHeight(), this);
-                } else {
-                    GradientPaint gradient = new GradientPaint(
-                            0, 0, AssetsLoader.getColor("menu_bg"),
-                            getWidth(), getHeight(), AssetsLoader.getColor("game_bg")
-                    );
-                    g2d.setPaint(gradient);
-                    g2d.fillRect(0, 0, getWidth(), getHeight());
-                }
+                g2d.setColor(new Color(40, 40, 60)); // FUNDAL ÎNCHIS
+                g2d.fillRect(0, 0, getWidth(), getHeight());
             }
         };
 
@@ -87,33 +79,33 @@ public class SudokuGamePanel extends JFrame {
 
     private JPanel createHeaderPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(AssetsLoader.getColor("header_bg"));
-        panel.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
-        panel.setPreferredSize(new Dimension(getWidth(), 70));
+        panel.setBackground(new Color(30, 70, 120)); // ALBASTRU ÎNCHIS
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        panel.setPreferredSize(new Dimension(getWidth(), 80));
 
         JPanel topRow = new JPanel(new BorderLayout());
         topRow.setOpaque(false);
 
         timerLabel = new JLabel("00:00");
-        timerLabel.setForeground(AssetsLoader.getColor("header_text"));
-        timerLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        timerLabel.setForeground(Color.YELLOW);
+        timerLabel.setFont(new Font("Arial", Font.BOLD, 20));
 
         heartsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
         heartsPanel.setOpaque(false);
-        heartsPanel.setPreferredSize(new Dimension(150, 25));
+        heartsPanel.setPreferredSize(new Dimension(150, 30));
         updateHeartsDisplay();
 
         coinsLabel = new JLabel("💰 " + cafeManager.getMoney());
-        coinsLabel.setForeground(AssetsLoader.getColor("header_text"));
-        coinsLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        coinsLabel.setForeground(Color.YELLOW);
+        coinsLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
         topRow.add(timerLabel, BorderLayout.WEST);
         topRow.add(heartsPanel, BorderLayout.CENTER);
         topRow.add(coinsLabel, BorderLayout.EAST);
 
         difficultyLabel = new JLabel(difficulty.getName(), SwingConstants.CENTER);
-        difficultyLabel.setForeground(AssetsLoader.getColor("header_text"));
-        difficultyLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        difficultyLabel.setForeground(Color.YELLOW);
+        difficultyLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
         panel.add(topRow, BorderLayout.NORTH);
         panel.add(difficultyLabel, BorderLayout.SOUTH);
@@ -128,13 +120,13 @@ public class SudokuGamePanel extends JFrame {
 
         for (int i = 0; i < hearts; i++) {
             JLabel heart = new JLabel("❤️");
-            heart.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
+            heart.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 24));
             heartsPanel.add(heart);
         }
 
         for (int i = hearts; i < maxHearts; i++) {
             JLabel heart = new JLabel("🤍");
-            heart.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
+            heart.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 24));
             heartsPanel.add(heart);
         }
 
@@ -149,7 +141,7 @@ public class SudokuGamePanel extends JFrame {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
 
-                g2d.setColor(new Color(0, 0, 0));
+                g2d.setColor(Color.BLACK);
                 g2d.setStroke(new BasicStroke(3));
 
                 for (int i = 1; i < 3; i++) {
@@ -160,7 +152,7 @@ public class SudokuGamePanel extends JFrame {
                     g2d.drawLine(0, y, getWidth(), y);
                 }
 
-                g2d.setColor(new Color(200, 200, 200));
+                g2d.setColor(new Color(100, 100, 100));
                 g2d.setStroke(new BasicStroke(1));
 
                 for (int i = 1; i < 9; i++) {
@@ -176,8 +168,8 @@ public class SudokuGamePanel extends JFrame {
         };
 
         sudokuGrid.setBackground(Color.WHITE);
-        sudokuGrid.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-        sudokuGrid.setPreferredSize(new Dimension(400, 400));
+        sudokuGrid.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 3));
+        sudokuGrid.setPreferredSize(new Dimension(500, 500));
 
         cells = new SudokuCell[9][9];
         int[][] board = engine.getBoard();
@@ -204,7 +196,7 @@ public class SudokuGamePanel extends JFrame {
             this.isSelected = false;
             this.isError = false;
 
-            setPreferredSize(new Dimension(40, 40));
+            setPreferredSize(new Dimension(50, 50));
             setCursor(new Cursor(Cursor.HAND_CURSOR));
 
             addMouseListener(new MouseAdapter() {
@@ -221,69 +213,38 @@ public class SudokuGamePanel extends JFrame {
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            g2d.setColor(Color.WHITE);
+            // FUNDAL CELULĂ
+            if (isSelected) {
+                g2d.setColor(new Color(173, 216, 230)); // ALBASTRU DESCHIS
+            } else if (isError) {
+                g2d.setColor(new Color(255, 182, 193)); // ROZ
+            } else if (isFixed) {
+                g2d.setColor(new Color(240, 240, 240)); // GRI DESCHIS
+            } else {
+                g2d.setColor(Color.WHITE);
+            }
             g2d.fillRect(0, 0, getWidth(), getHeight());
 
-            if (isSelected) {
-                g2d.setColor(AssetsLoader.getColor("cell_selected"));
-                for (int c = 0; c < 9; c++) {
-                    if (c != col) {
-                        g2d.fillRect(c * getWidth(), 0, getWidth(), getHeight());
-                    }
-                }
-
-                for (int r = 0; r < 9; r++) {
-                    if (r != row) {
-                        g2d.fillRect(0, r * getHeight(), getWidth(), getHeight());
-                    }
-                }
-
-                int startRow = row - row % 3;
-                int startCol = col - col % 3;
-                g2d.setColor(new Color(220, 240, 255));
-                for (int r = startRow; r < startRow + 3; r++) {
-                    for (int c = startCol; c < startCol + 3; c++) {
-                        if (r != row || c != col) {
-                            g2d.fillRect(c * getWidth(), r * getHeight(), getWidth(), getHeight());
-                        }
-                    }
-                }
-
-                g2d.setColor(new Color(0, 100, 255));
-                g2d.setStroke(new BasicStroke(2));
-                g2d.drawRect(1, 1, getWidth()-2, getHeight()-2);
-            }
-
-            if (isFixed) {
-                g2d.setColor(new Color(240, 240, 240));
-                g2d.fillRect(0, 0, getWidth(), getHeight());
-            }
-
-            if (isError) {
-                g2d.setColor(AssetsLoader.getColor("cell_error"));
-                g2d.fillRect(0, 0, getWidth(), getHeight());
-            }
-
+            // NUMĂR
             if (value != 0) {
                 if (isError) {
                     g2d.setColor(Color.RED);
                 } else if (isFixed) {
                     g2d.setColor(Color.BLACK);
                 } else {
-                    g2d.setColor(new Color(0, 100, 200));
+                    g2d.setColor(new Color(0, 100, 200)); // ALBASTRU
                 }
 
-                g2d.setFont(new Font("Arial", Font.BOLD, 18));
-
+                g2d.setFont(new Font("Arial", Font.BOLD, 20));
                 FontMetrics fm = g2d.getFontMetrics();
                 String text = String.valueOf(value);
                 int x = (getWidth() - fm.stringWidth(text)) / 2;
                 int y = (getHeight() + fm.getAscent()) / 2 - 2;
-
                 g2d.drawString(text, x, y);
             }
 
-            g2d.setColor(new Color(200, 200, 200));
+            // BORDURĂ
+            g2d.setColor(new Color(150, 150, 150));
             g2d.setStroke(new BasicStroke(1));
             g2d.drawRect(0, 0, getWidth()-1, getHeight()-1);
         }
@@ -348,10 +309,10 @@ public class SudokuGamePanel extends JFrame {
             int flashCount = 0;
             @Override
             public void actionPerformed(ActionEvent e) {
-                difficultyLabel.setForeground(flashCount % 2 == 0 ? Color.RED : AssetsLoader.getColor("header_text"));
+                difficultyLabel.setForeground(flashCount % 2 == 0 ? Color.RED : Color.YELLOW);
                 flashCount++;
                 if (flashCount > 6) {
-                    difficultyLabel.setForeground(AssetsLoader.getColor("header_text"));
+                    difficultyLabel.setForeground(Color.YELLOW);
                     ((Timer)e.getSource()).stop();
 
                     JOptionPane.showMessageDialog(SudokuGamePanel.this,
@@ -379,54 +340,104 @@ public class SudokuGamePanel extends JFrame {
 
     private JPanel createControlPanel() {
         JPanel panel = new JPanel(new FlowLayout());
-        panel.setBackground(AssetsLoader.getColor("control_bg"));
-        panel.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
+        panel.setBackground(new Color(50, 50, 70));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 
-        panel.add(createControlButton("Check", new Color(76, 175, 80), e -> checkSolution()));
-        panel.add(createControlButton("Hint (25¢)", new Color(255, 152, 0), e -> showHint()));
-        panel.add(createControlButton("Solve", new Color(156, 39, 176), e -> showSolution()));
-        panel.add(createControlButton("New Game", new Color(33, 150, 243), e -> newGame()));
-        panel.add(createControlButton("Menu", new Color(244, 67, 54), e -> returnToMenu()));
+        // BUTOANE DE CONTROL MARI ȘI COLORATE
+        panel.add(createControlButton("CHECK", Color.GREEN, e -> checkSolution()));
+        panel.add(createControlButton("HINT (25¢)", Color.ORANGE, e -> showHint()));
+        panel.add(createControlButton("SOLVE", Color.MAGENTA, e -> showSolution()));
+        panel.add(createControlButton("NEW GAME", Color.CYAN, e -> newGame()));
+        panel.add(createControlButton("MENU", Color.RED, e -> returnToMenu()));
 
         return panel;
     }
 
     private JPanel createNumberPanel() {
-        JPanel panel = new JPanel(new GridLayout(0, 1, 2, 2));
-        panel.setBackground(AssetsLoader.getColor("control_bg"));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
-        panel.setPreferredSize(new Dimension(60, 400));
+        JPanel panel = new JPanel(new GridLayout(0, 1, 5, 5));
+        panel.setBackground(new Color(50, 50, 70));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
+        panel.setPreferredSize(new Dimension(100, 500));
 
+        // BUTOANELE 1-9 COLORATE
         for (int i = 1; i <= 9; i++) {
-            JButton numberBtn = new JButton(String.valueOf(i));
-            numberBtn.setFont(new Font("Arial", Font.BOLD, 18)); // Mărim fontul
-            numberBtn.setBackground(AssetsLoader.getColor("button_primary"));
-            numberBtn.setForeground(Color.WHITE); // Text alb pentru contrast
-            numberBtn.setFocusPainted(false);
-            numberBtn.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0)); // Mai mult padding
-            numberBtn.addActionListener(e -> inputNumber(Integer.parseInt(numberBtn.getText())));
+            JButton numberBtn = createNumberButton(String.valueOf(i), getNumberColor(i));
             panel.add(numberBtn);
         }
 
-        JButton clearBtn = new JButton("Clear");
-        clearBtn.setFont(new Font("Arial", Font.BOLD, 14));
-        clearBtn.setBackground(Color.RED);
-        clearBtn.setForeground(Color.WHITE); // Text alb
+        // BUTON CLEAR
+        JButton clearBtn = createNumberButton("CLEAR", Color.RED);
         clearBtn.addActionListener(e -> inputNumber(0));
         panel.add(clearBtn);
 
         return panel;
     }
 
+    private JButton createNumberButton(String text, Color color) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Arial", Font.BOLD, 20));
+        button.setBackground(color);
+        button.setForeground(Color.BLACK); // TEXT NEGRU
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        button.setPreferredSize(new Dimension(80, 50));
+
+        // Efect hover
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(color.brighter());
+                button.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 3));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(color);
+                button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+            }
+        });
+
+        if (!text.equals("CLEAR")) {
+            button.addActionListener(e -> inputNumber(Integer.parseInt(text)));
+        }
+
+        return button;
+    }
+
+    private Color getNumberColor(int number) {
+        switch (number) {
+            case 1: return new Color(255, 200, 200); // ROZ DESCHIS
+            case 2: return new Color(255, 255, 200); // GALBEN DESCHIS
+            case 3: return new Color(200, 255, 200); // VERDE DESCHIS
+            case 4: return new Color(200, 255, 255); // ALBASTRU DESCHIS
+            case 5: return new Color(200, 200, 255); // VIOLET DESCHIS
+            case 6: return new Color(255, 200, 255); // MOV DESCHIS
+            case 7: return new Color(255, 220, 180); // PORTOCALIU DESCHIS
+            case 8: return new Color(220, 220, 220); // GRI
+            case 9: return new Color(255, 180, 120); // PORTOCALIU
+            default: return Color.WHITE;
+        }
+    }
+
     private JButton createControlButton(String text, Color color, ActionListener action) {
         JButton button = new JButton(text);
-        button.setFont(new Font("Arial", Font.BOLD, 14)); // Font mai mare
+        button.setFont(new Font("Arial", Font.BOLD, 14));
         button.setBackground(color);
-        button.setForeground(Color.WHITE); // Text alb pentru contrast
+        button.setForeground(Color.BLACK); // TEXT NEGRU
         button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15)); // Mai mult padding
+        button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        button.setPreferredSize(new Dimension(120, 40));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.addActionListener(action);
+
+        // Efect hover
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(color.brighter());
+                button.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 3));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(color);
+                button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+            }
+        });
 
         return button;
     }
@@ -554,7 +565,7 @@ public class SudokuGamePanel extends JFrame {
 
         if (response == JOptionPane.YES_OPTION) {
             this.dispose();
-            SudokuGamePanel newGame = new SudokuGamePanel(mainMenu, cafeManager, difficulty);
+            SudokuGamePanel newGame = new SudokuGamePanel(this.mainMenu, this.cafeManager, this.difficulty);
             newGame.setVisible(true);
         }
     }
