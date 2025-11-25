@@ -20,9 +20,9 @@ public class MainMeniu extends JFrame {
     private void initializeUI() {
         setTitle("Sudoku Cafe");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600);
+        setSize(600, 500); // FEREASTRĂ MAI MICĂ
         setLocationRelativeTo(null);
-        setResizable(false);
+        setResizable(true); // PERMITEM REDIMENSIONAREA
 
         // FUNDAL GRI ÎNCHIS PENTRU CONTRAST
         JPanel mainPanel = new JPanel();
@@ -31,15 +31,15 @@ public class MainMeniu extends JFrame {
 
         // HEADER - ALBASTRU ÎNCHIS
         JPanel headerPanel = new JPanel();
-        headerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 30, 15));
+        headerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10)); // MAI PUȚIN SPAȚIU
         headerPanel.setBackground(new Color(30, 70, 120));
-        headerPanel.setPreferredSize(new Dimension(800, 80));
+        headerPanel.setPreferredSize(new Dimension(600, 60)); // MAI MIC
 
         moneyLabel = new JLabel("💰 " + cafeManager.getMoney() + " coins");
         cafeLevelLabel = new JLabel("🏪 Level " + cafeManager.getCafeLevel());
 
-        moneyLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        cafeLevelLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        moneyLabel.setFont(new Font("Arial", Font.BOLD, 16)); // FONT MAI MIC
+        cafeLevelLabel.setFont(new Font("Arial", Font.BOLD, 16));
         moneyLabel.setForeground(Color.YELLOW);
         cafeLevelLabel.setForeground(Color.YELLOW);
 
@@ -48,15 +48,15 @@ public class MainMeniu extends JFrame {
 
         // TITLU - GALBEN STRĂLUCITOR
         JLabel titleLabel = new JLabel("SUDOKU CAFE", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 48));
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 36)); // FONT MAI MIC
         titleLabel.setForeground(Color.YELLOW);
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(40, 0, 40, 0));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0)); // MAI PUȚIN SPAȚIU
 
         // PANEL BUTOANE
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(5, 1, 15, 15));
+        buttonPanel.setLayout(new GridLayout(5, 1, 8, 8)); // MAI PUȚIN SPAȚIU ÎNTRE BUTOANE
         buttonPanel.setBackground(new Color(50, 50, 50));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 120, 20, 120));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 80, 10, 80)); // MARGINI MAI MICI
 
         // BUTOANE CU CULORI PUTERNICE ȘI TEXT NEGRU
         JButton playButton = createButton("🎮 PLAY SUDOKU", Color.CYAN);
@@ -88,29 +88,30 @@ public class MainMeniu extends JFrame {
     private JButton createButton(String text, Color backgroundColor) {
         JButton button = new JButton(text);
 
-        // BUTON CU CULOARE PUTERNICĂ ȘI TEXT NEGRU
-        button.setFont(new Font("Arial", Font.BOLD, 22));
+        // BUTON MAI MIC
+        button.setFont(new Font("Arial", Font.BOLD, 16)); // FONT MAI MIC
         button.setBackground(backgroundColor);
-        button.setForeground(Color.BLACK); // TEXT NEGRU
+        button.setForeground(Color.BLACK);
         button.setFocusPainted(true);
-        button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
-        button.setPreferredSize(new Dimension(400, 70));
+        button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        button.setPreferredSize(new Dimension(300, 45)); // BUTOANE MAI MICI
 
-        // Efect hover - culoare mai deschisă
+        // Efect hover
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(backgroundColor.brighter());
-                button.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 4));
+                button.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 3));
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 button.setBackground(backgroundColor);
-                button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
+                button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
             }
         });
 
         return button;
     }
 
+    // ... restul metodelor rămân la fel ...
     private void openCafeScene() {
         this.setVisible(false);
         CafeScene cafeScene = new CafeScene(this, cafeManager);

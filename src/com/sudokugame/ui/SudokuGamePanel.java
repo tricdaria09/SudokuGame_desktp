@@ -53,18 +53,16 @@ public class SudokuGamePanel extends JFrame {
 
     private void initializeUI() {
         setTitle("Sudoku - " + difficulty.getName());
-        setSize(800, 900); // Mărim fereastra
+        setSize(700, 750); // FEREASTRĂ MAI MICĂ
         setLocationRelativeTo(null);
-        setResizable(false);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setResizable(true); // PERMITEM REDIMENSIONAREA
 
-        // FUNDAL ÎNCHIS PENTRU CONTRAST
         JPanel mainPanel = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
-                g2d.setColor(new Color(40, 40, 60)); // FUNDAL ÎNCHIS
+                g2d.setColor(new Color(40, 40, 60));
                 g2d.fillRect(0, 0, getWidth(), getHeight());
             }
         };
@@ -79,25 +77,25 @@ public class SudokuGamePanel extends JFrame {
 
     private JPanel createHeaderPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(30, 70, 120)); // ALBASTRU ÎNCHIS
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
-        panel.setPreferredSize(new Dimension(getWidth(), 80));
+        panel.setBackground(new Color(30, 70, 120));
+        panel.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
+        panel.setPreferredSize(new Dimension(getWidth(), 60)); // HEADER MAI MIC
 
         JPanel topRow = new JPanel(new BorderLayout());
         topRow.setOpaque(false);
 
         timerLabel = new JLabel("00:00");
         timerLabel.setForeground(Color.YELLOW);
-        timerLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        timerLabel.setFont(new Font("Arial", Font.BOLD, 16)); // FONT MAI MIC
 
-        heartsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+        heartsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 3, 0));
         heartsPanel.setOpaque(false);
-        heartsPanel.setPreferredSize(new Dimension(150, 30));
+        heartsPanel.setPreferredSize(new Dimension(120, 25)); // PANEL INIMI MAI MIC
         updateHeartsDisplay();
 
         coinsLabel = new JLabel("💰 " + cafeManager.getMoney());
         coinsLabel.setForeground(Color.YELLOW);
-        coinsLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        coinsLabel.setFont(new Font("Arial", Font.BOLD, 14)); // FONT MAI MIC
 
         topRow.add(timerLabel, BorderLayout.WEST);
         topRow.add(heartsPanel, BorderLayout.CENTER);
@@ -105,7 +103,7 @@ public class SudokuGamePanel extends JFrame {
 
         difficultyLabel = new JLabel(difficulty.getName(), SwingConstants.CENTER);
         difficultyLabel.setForeground(Color.YELLOW);
-        difficultyLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        difficultyLabel.setFont(new Font("Arial", Font.BOLD, 16)); // FONT MAI MIC
 
         panel.add(topRow, BorderLayout.NORTH);
         panel.add(difficultyLabel, BorderLayout.SOUTH);
@@ -120,13 +118,13 @@ public class SudokuGamePanel extends JFrame {
 
         for (int i = 0; i < hearts; i++) {
             JLabel heart = new JLabel("❤️");
-            heart.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 24));
+            heart.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20)); // INIMI MAI MICI
             heartsPanel.add(heart);
         }
 
         for (int i = hearts; i < maxHearts; i++) {
             JLabel heart = new JLabel("🤍");
-            heart.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 24));
+            heart.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20));
             heartsPanel.add(heart);
         }
 
@@ -142,7 +140,7 @@ public class SudokuGamePanel extends JFrame {
                 Graphics2D g2d = (Graphics2D) g;
 
                 g2d.setColor(Color.BLACK);
-                g2d.setStroke(new BasicStroke(3));
+                g2d.setStroke(new BasicStroke(2)); // LINII MAI SUBȚIRI
 
                 for (int i = 1; i < 3; i++) {
                     int x = i * getWidth() / 3;
@@ -168,8 +166,8 @@ public class SudokuGamePanel extends JFrame {
         };
 
         sudokuGrid.setBackground(Color.WHITE);
-        sudokuGrid.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 3));
-        sudokuGrid.setPreferredSize(new Dimension(500, 500));
+        sudokuGrid.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 2)); // BORDURĂ MAI SUBȚIRE
+        sudokuGrid.setPreferredSize(new Dimension(400, 400)); // GRID MAI MIC
 
         cells = new SudokuCell[9][9];
         int[][] board = engine.getBoard();
@@ -196,7 +194,7 @@ public class SudokuGamePanel extends JFrame {
             this.isSelected = false;
             this.isError = false;
 
-            setPreferredSize(new Dimension(50, 50));
+            setPreferredSize(new Dimension(35, 35)); // CELULE MAI MICI
             setCursor(new Cursor(Cursor.HAND_CURSOR));
 
             addMouseListener(new MouseAdapter() {
@@ -215,11 +213,11 @@ public class SudokuGamePanel extends JFrame {
 
             // FUNDAL CELULĂ
             if (isSelected) {
-                g2d.setColor(new Color(173, 216, 230)); // ALBASTRU DESCHIS
+                g2d.setColor(new Color(173, 216, 230));
             } else if (isError) {
-                g2d.setColor(new Color(255, 182, 193)); // ROZ
+                g2d.setColor(new Color(255, 182, 193));
             } else if (isFixed) {
-                g2d.setColor(new Color(240, 240, 240)); // GRI DESCHIS
+                g2d.setColor(new Color(240, 240, 240));
             } else {
                 g2d.setColor(Color.WHITE);
             }
@@ -232,10 +230,10 @@ public class SudokuGamePanel extends JFrame {
                 } else if (isFixed) {
                     g2d.setColor(Color.BLACK);
                 } else {
-                    g2d.setColor(new Color(0, 100, 200)); // ALBASTRU
+                    g2d.setColor(new Color(0, 100, 200));
                 }
 
-                g2d.setFont(new Font("Arial", Font.BOLD, 20));
+                g2d.setFont(new Font("Arial", Font.BOLD, 16)); // FONT MAI MIC
                 FontMetrics fm = g2d.getFontMetrics();
                 String text = String.valueOf(value);
                 int x = (getWidth() - fm.stringWidth(text)) / 2;
@@ -293,57 +291,12 @@ public class SudokuGamePanel extends JFrame {
         }
     }
 
-    private void loseHeart() {
-        hearts--;
-        updateHeartsDisplay();
-
-        if (hearts <= 0) {
-            gameOver();
-        } else {
-            showHeartLossAnimation();
-        }
-    }
-
-    private void showHeartLossAnimation() {
-        Timer heartTimer = new Timer(100, new ActionListener() {
-            int flashCount = 0;
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                difficultyLabel.setForeground(flashCount % 2 == 0 ? Color.RED : Color.YELLOW);
-                flashCount++;
-                if (flashCount > 6) {
-                    difficultyLabel.setForeground(Color.YELLOW);
-                    ((Timer)e.getSource()).stop();
-
-                    JOptionPane.showMessageDialog(SudokuGamePanel.this,
-                            "💔 Wrong number!\n❤️ You lost one heart!\nHearts remaining: " + hearts + "/" + maxHearts,
-                            "Incorrect Move",
-                            JOptionPane.WARNING_MESSAGE);
-                }
-            }
-        });
-        heartTimer.start();
-    }
-
-    private void gameOver() {
-        if (gameTimer != null) {
-            gameTimer.stop();
-        }
-
-        JOptionPane.showMessageDialog(this,
-                "💔 GAME OVER!\n\n⏱️ Time: " + timerLabel.getText() + "\n❤️ Hearts: 0/" + maxHearts + "\n🎯 Difficulty: " + difficulty.getName(),
-                "Game Over",
-                JOptionPane.ERROR_MESSAGE);
-
-        returnToMenu();
-    }
-
     private JPanel createControlPanel() {
         JPanel panel = new JPanel(new FlowLayout());
         panel.setBackground(new Color(50, 50, 70));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        panel.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
 
-        // BUTOANE DE CONTROL MARI ȘI COLORATE
+        // BUTOANE DE CONTROL MAI MICI
         panel.add(createControlButton("CHECK", Color.GREEN, e -> checkSolution()));
         panel.add(createControlButton("HINT (25¢)", Color.ORANGE, e -> showHint()));
         panel.add(createControlButton("SOLVE", Color.MAGENTA, e -> showSolution()));
@@ -354,12 +307,12 @@ public class SudokuGamePanel extends JFrame {
     }
 
     private JPanel createNumberPanel() {
-        JPanel panel = new JPanel(new GridLayout(0, 1, 5, 5));
+        JPanel panel = new JPanel(new GridLayout(0, 1, 3, 3)); // MAI PUȚIN SPAȚIU
         panel.setBackground(new Color(50, 50, 70));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
-        panel.setPreferredSize(new Dimension(100, 500));
+        panel.setBorder(BorderFactory.createEmptyBorder(15, 8, 15, 8));
+        panel.setPreferredSize(new Dimension(80, 400)); // PANEL MAI MIC
 
-        // BUTOANELE 1-9 COLORATE
+        // BUTOANELE 1-9 MAI MICI
         for (int i = 1; i <= 9; i++) {
             JButton numberBtn = createNumberButton(String.valueOf(i), getNumberColor(i));
             panel.add(numberBtn);
@@ -375,18 +328,17 @@ public class SudokuGamePanel extends JFrame {
 
     private JButton createNumberButton(String text, Color color) {
         JButton button = new JButton(text);
-        button.setFont(new Font("Arial", Font.BOLD, 20));
+        button.setFont(new Font("Arial", Font.BOLD, 16)); // FONT MAI MIC
         button.setBackground(color);
-        button.setForeground(Color.BLACK); // TEXT NEGRU
+        button.setForeground(Color.BLACK);
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-        button.setPreferredSize(new Dimension(80, 50));
+        button.setPreferredSize(new Dimension(60, 40)); // BUTOANE MAI MICI
 
-        // Efect hover
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(color.brighter());
-                button.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 3));
+                button.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 2));
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 button.setBackground(color);
@@ -401,37 +353,21 @@ public class SudokuGamePanel extends JFrame {
         return button;
     }
 
-    private Color getNumberColor(int number) {
-        switch (number) {
-            case 1: return new Color(255, 200, 200); // ROZ DESCHIS
-            case 2: return new Color(255, 255, 200); // GALBEN DESCHIS
-            case 3: return new Color(200, 255, 200); // VERDE DESCHIS
-            case 4: return new Color(200, 255, 255); // ALBASTRU DESCHIS
-            case 5: return new Color(200, 200, 255); // VIOLET DESCHIS
-            case 6: return new Color(255, 200, 255); // MOV DESCHIS
-            case 7: return new Color(255, 220, 180); // PORTOCALIU DESCHIS
-            case 8: return new Color(220, 220, 220); // GRI
-            case 9: return new Color(255, 180, 120); // PORTOCALIU
-            default: return Color.WHITE;
-        }
-    }
-
     private JButton createControlButton(String text, Color color, ActionListener action) {
         JButton button = new JButton(text);
-        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setFont(new Font("Arial", Font.BOLD, 12)); // FONT MAI MIC
         button.setBackground(color);
-        button.setForeground(Color.BLACK); // TEXT NEGRU
+        button.setForeground(Color.BLACK);
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-        button.setPreferredSize(new Dimension(120, 40));
+        button.setPreferredSize(new Dimension(100, 35)); // BUTOANE MAI MICI
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.addActionListener(action);
 
-        // Efect hover
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(color.brighter());
-                button.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 3));
+                button.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 2));
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 button.setBackground(color);
@@ -441,6 +377,8 @@ public class SudokuGamePanel extends JFrame {
 
         return button;
     }
+
+    // ... restul metodelor rămân la fel ...
 
     private void inputNumber(int number) {
         if (selectedRow != -1 && selectedCol != -1) {
@@ -586,5 +524,65 @@ public class SudokuGamePanel extends JFrame {
         this.dispose();
         mainMenu.setVisible(true);
         mainMenu.updateDisplay();
+    }
+
+    private Color getNumberColor(int number) {
+        switch (number) {
+            case 1: return new Color(255, 200, 200);
+            case 2: return new Color(255, 255, 200);
+            case 3: return new Color(200, 255, 200);
+            case 4: return new Color(200, 255, 255);
+            case 5: return new Color(200, 200, 255);
+            case 6: return new Color(255, 200, 255);
+            case 7: return new Color(255, 220, 180);
+            case 8: return new Color(220, 220, 220);
+            case 9: return new Color(255, 180, 120);
+            default: return Color.WHITE;
+        }
+    }
+
+    private void loseHeart() {
+        hearts--;
+        updateHeartsDisplay();
+
+        if (hearts <= 0) {
+            gameOver();
+        } else {
+            showHeartLossAnimation();
+        }
+    }
+
+    private void showHeartLossAnimation() {
+        Timer heartTimer = new Timer(100, new ActionListener() {
+            int flashCount = 0;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                difficultyLabel.setForeground(flashCount % 2 == 0 ? Color.RED : Color.YELLOW);
+                flashCount++;
+                if (flashCount > 6) {
+                    difficultyLabel.setForeground(Color.YELLOW);
+                    ((Timer)e.getSource()).stop();
+
+                    JOptionPane.showMessageDialog(SudokuGamePanel.this,
+                            "💔 Wrong number!\n❤️ You lost one heart!\nHearts remaining: " + hearts + "/" + maxHearts,
+                            "Incorrect Move",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        });
+        heartTimer.start();
+    }
+
+    private void gameOver() {
+        if (gameTimer != null) {
+            gameTimer.stop();
+        }
+
+        JOptionPane.showMessageDialog(this,
+                "💔 GAME OVER!\n\n⏱️ Time: " + timerLabel.getText() + "\n❤️ Hearts: 0/" + maxHearts + "\n🎯 Difficulty: " + difficulty.getName(),
+                "Game Over",
+                JOptionPane.ERROR_MESSAGE);
+
+        returnToMenu();
     }
 }

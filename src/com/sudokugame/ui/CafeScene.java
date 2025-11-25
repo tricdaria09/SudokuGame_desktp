@@ -27,9 +27,9 @@ public class CafeScene extends JFrame {
     private void initializeUI() {
         setTitle("My Cafe - Management");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(800, 600);
+        setSize(700, 500); // FEREASTRĂ MAI MICĂ
         setLocationRelativeTo(null);
-        setResizable(false);
+        setResizable(true); // PERMITEM REDIMENSIONAREA
 
         // FUNDAL ÎNCHIS PENTRU CONTRAST
         JPanel mainPanel = new JPanel(new BorderLayout());
