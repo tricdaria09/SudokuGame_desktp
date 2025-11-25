@@ -121,9 +121,13 @@ public class CafeManager {
     private void spawnCustomer() {
         if (customersList.size() < maxCustomers) {
             Random rand = new Random();
-            if (rand.nextInt(100) < getSpawnChance()) {
-                Customer newCustomer = new Customer(1000, 300 + rand.nextInt(200));
+            int spawnChance = getSpawnChance();
+            if (rand.nextInt(100) < spawnChance) {
+                int startX = 1000; // Începe din dreapta
+                int startY = 300 + rand.nextInt(200);
+                Customer newCustomer = new Customer(startX, startY);
                 customersList.add(newCustomer);
+                System.out.println("👥 New customer spawned! Total: " + customersList.size());
             }
         }
     }
@@ -227,13 +231,28 @@ public class CafeManager {
     }
 
     public void serveCustomer(Customer customer) {
-        if (customersList.contains(customer)) {
+        if (customersList.contains(customer) && customer.isReadyToOrder()) {
             customer.serve();
             satisfaction = Math.min(100, satisfaction + 5);
-            int spending = customer.calculateSpending() / 2;
+            int spending = customer.calculateSpending();
             money += spending;
             totalIncome += spending;
+
+            // Adaugă un mesaj de feedback
+            System.out.println("✅ Customer served! Earned: " + spending + " coins");
         }
+    }
+
+    public void debugCustomers() {
+        System.out.println("=== CUSTOMER DEBUG ===");
+        System.out.println("Total customers: " + customersList.size());
+        for (int i = 0; i < customersList.size(); i++) {
+            Customer c = customersList.get(i);
+            System.out.println("Customer " + i + ": " + c.getType() +
+                    ", State: " + c.getState() +
+                    ", Ready to order: " + c.isReadyToOrder());
+        }
+        System.out.println("======================");
     }
 
     public int getHourlyIncome() {

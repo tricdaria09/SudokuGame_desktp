@@ -1,435 +1,223 @@
 package com.sudokugame.ui;
 
 import com.sudokugame.cafe.CafeManager;
-import com.sudokugame.cafe.CafeObject;
 import com.sudokugame.cafe.Customer;
 import com.sudokugame.utils.AssetsLoader;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class CafeScene extends JFrame {
     private MainMeniu mainMeniu;
     private CafeManager cafeManager;
-    private List<CafeObject> cafeObjects;
     private JLabel moneyLabel;
     private JLabel satisfactionLabel;
-    private JLabel customersLabel;
+    private JTextArea customerArea;
+    private Timer gameTimer;
 
     public CafeScene(MainMeniu mainMeniu, CafeManager cafeManager) {
         this.mainMeniu = mainMeniu;
         this.cafeManager = cafeManager;
-        this.cafeObjects = new ArrayList<>();
-        initializeCafeObjects();
         initializeUI();
-    }
-
-    private void initializeCafeObjects() {
-        cafeObjects.add(new CafeObject("Coffee Machine", 100, 200, 150, 200, "coffee_machine"));
-        cafeObjects.add(new CafeObject("Pastry Counter", 300, 200, 150, 150, "pastry_counter"));
-        cafeObjects.add(new CafeObject("Register", 500, 250, 120, 120, "register"));
-        cafeObjects.add(new CafeObject("Table 1", 200, 400, 100, 100, "table"));
-        cafeObjects.add(new CafeObject("Table 2", 400, 400, 100, 100, "table"));
-        cafeObjects.add(new CafeObject("Table 3", 600, 400, 100, 100, "table"));
-
-        for (CafeObject obj : cafeObjects) {
-            cafeManager.addCafeObject(obj);
-        }
+        startGameLoop();
     }
 
     private void initializeUI() {
-        setTitle("My Cafe - Management");
+        setTitle("My Cafe - Simple Management");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(900, 650);
+        setSize(700, 500);
         setLocationRelativeTo(null);
         setResizable(false);
 
-        JPanel scenePanel = new JPanel(new BorderLayout()) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(new Color(245, 222, 179)); // Cafe color
 
-                Image background = AssetsLoader.getImage("cafe_scene");
-                if (background != null) {
-                    g2d.drawImage(background, 0, 0, getWidth(), getHeight(), this);
-                } else {
-                    GradientPaint gradient = new GradientPaint(
-                            0, 0, AssetsLoader.getColor("cafe_bg"),
-                            getWidth(), getHeight(), AssetsLoader.getColor("menu_bg")
-                    );
-                    g2d.setPaint(gradient);
-                    g2d.fillRect(0, 0, getWidth(), getHeight());
-                    g2d.setColor(new Color(160, 120, 80));
-                    g2d.fillRect(0, 500, getWidth(), getHeight() - 500);
-                    g2d.setColor(new Color(200, 200, 200));
-                    g2d.fillRect(0, 0, getWidth(), 100);
-                }
+        // HEADER
+        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        headerPanel.setBackground(new Color(139, 69, 19));
+        headerPanel.setPreferredSize(new Dimension(700, 60));
 
-                for (CafeObject obj : cafeObjects) {
-                    obj.draw(g2d);
-                }
+        moneyLabel = new JLabel("💰 Money: " + cafeManager.getMoney() + " coins");
+        satisfactionLabel = new JLabel("😊 Satisfaction: " + cafeManager.getSatisfaction() + "%");
 
-                drawCustomers(g2d);
-                drawCustomerInteractions(g2d);
-            }
-        };
-
-        scenePanel.setLayout(null);
-
-        JPanel headerPanel = createHeaderPanel();
-        scenePanel.add(headerPanel);
-        headerPanel.setBounds(0, 0, getWidth(), 60);
-
-        JPanel sidebarPanel = createSidebarPanel();
-        scenePanel.add(sidebarPanel);
-        sidebarPanel.setBounds(getWidth() - 250, 60, 250, getHeight() - 60);
-
-        scenePanel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                handleObjectClick(e.getX(), e.getY());
-            }
-        });
-
-        javax.swing.Timer refreshTimer = new javax.swing.Timer(100, e -> scenePanel.repaint());
-        refreshTimer.start();
-
-        add(scenePanel);
-    }
-
-    private void drawCustomers(Graphics2D g2d) {
-        for (Customer customer : cafeManager.getCustomersList()) {
-            customer.draw(g2d);
-        }
-    }
-
-    private void drawCustomerInteractions(Graphics2D g2d) {
-        for (Customer customer : cafeManager.getCustomersList()) {
-            if (customer.isReadyToOrder()) {
-                g2d.setColor(new Color(0, 200, 0, 200));
-                g2d.fillOval(customer.getX() + customer.getWidth() - 15,
-                        customer.getY() - 25, 25, 25);
-                g2d.setColor(Color.WHITE);
-                g2d.setFont(new Font("Arial", Font.BOLD, 14));
-                g2d.drawString("📝", customer.getX() + customer.getWidth() - 12,
-                        customer.getY() - 10);
-            }
-
-            if (customer.isAngry()) {
-                g2d.setColor(new Color(255, 0, 0, 200));
-                g2d.fillOval(customer.getX() + customer.getWidth() - 15,
-                        customer.getY() - 25, 25, 25);
-                g2d.setColor(Color.WHITE);
-                g2d.setFont(new Font("Arial", Font.BOLD, 14));
-                g2d.drawString("😠", customer.getX() + customer.getWidth() - 12,
-                        customer.getY() - 10);
-            }
-        }
-    }
-
-    private void handleObjectClick(int x, int y) {
-        for (Customer customer : cafeManager.getCustomersList()) {
-            if (x >= customer.getX() && x <= customer.getX() + customer.getWidth() &&
-                    y >= customer.getY() && y <= customer.getY() + customer.getHeight()) {
-                showCustomerMenu(customer, x, y);
-                return;
-            }
-        }
-
-        for (CafeObject obj : cafeObjects) {
-            if (obj.contains(x, y)) {
-                showObjectMenu(obj, x, y);
-                break;
-            }
-        }
-    }
-
-    private JPanel createHeaderPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(139, 69, 19, 220));
-        panel.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
-
-        JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
-        infoPanel.setOpaque(false);
-
-        moneyLabel = new JLabel("💰 " + cafeManager.getFormattedMoney() + " coins");
-        moneyLabel.setForeground(Color.WHITE);
         moneyLabel.setFont(new Font("Arial", Font.BOLD, 16));
-
-        satisfactionLabel = new JLabel("😊 " + cafeManager.getSatisfaction() + "%");
-        satisfactionLabel.setForeground(getSatisfactionColor(cafeManager.getSatisfaction()));
         satisfactionLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        moneyLabel.setForeground(Color.WHITE);
+        satisfactionLabel.setForeground(getSatisfactionColor(cafeManager.getSatisfaction()));
 
-        customersLabel = new JLabel("👥 " + cafeManager.getCustomerCount() + "/" + cafeManager.getMaxCustomers());
-        customersLabel.setForeground(Color.YELLOW);
-        customersLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        headerPanel.add(moneyLabel);
+        headerPanel.add(satisfactionLabel);
 
-        infoPanel.add(moneyLabel);
-        infoPanel.add(satisfactionLabel);
-        infoPanel.add(customersLabel);
-
-        JButton backButton = new JButton("← Back to Menu");
-        backButton.setBackground(new Color(210, 180, 140));
+        JButton backButton = new JButton("← Back");
+        backButton.setFont(new Font("Arial", Font.BOLD, 14));
+        backButton.setBackground(Color.ORANGE);
         backButton.setForeground(Color.BLACK);
-        backButton.setFont(new Font("Arial", Font.BOLD, 12));
-        backButton.setFocusPainted(false);
         backButton.addActionListener(e -> goBack());
+        headerPanel.add(backButton);
 
-        panel.add(infoPanel, BorderLayout.WEST);
-        panel.add(backButton, BorderLayout.EAST);
+        // CENTER - Customer Management
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setBorder(BorderFactory.createTitledBorder("👥 Customers"));
+        centerPanel.setBackground(Color.WHITE);
 
-        return panel;
-    }
+        customerArea = new JTextArea();
+        customerArea.setEditable(false);
+        customerArea.setFont(new Font("Arial", Font.PLAIN, 14));
+        customerArea.setBackground(new Color(253, 245, 230));
+        JScrollPane scrollPane = new JScrollPane(customerArea);
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
 
-    private JPanel createSidebarPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(new Color(0, 0, 0, 200));
-        panel.setBorder(BorderFactory.createEmptyBorder(15, 12, 15, 12));
+        // ACTIONS Panel
+        JPanel actionPanel = new JPanel(new FlowLayout());
+        actionPanel.setBackground(Color.WHITE);
 
-        JLabel titleLabel = new JLabel("🏪 Cafe Manager");
-        titleLabel.setForeground(Color.WHITE);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        titleLabel.setAlignmentX(CENTER_ALIGNMENT);
+        JButton serveButton = new JButton("☕ Serve All Customers");
+        serveButton.setFont(new Font("Arial", Font.BOLD, 14));
+        serveButton.setBackground(new Color(76, 175, 80));
+        serveButton.setForeground(Color.WHITE);
+        serveButton.addActionListener(e -> serveAllCustomers());
 
-        panel.add(titleLabel);
-        panel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        addStat(panel, "Cafe Level", "⭐ " + cafeManager.getCafeLevel());
-        addStat(panel, "Total Income", "💰 " + cafeManager.getTotalIncome() + " coins");
-        addStat(panel, "Hourly Income", "📈 " + cafeManager.getHourlyIncome() + "/h");
-        addStat(panel, "Games Won", "🏆 " + cafeManager.getGamesWon() + "/" + cafeManager.getGamesPlayed());
-        addStat(panel, "Win Rate", "🎯 " + String.format("%.1f", cafeManager.getWinRate()) + "%");
-
-        panel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        JLabel upgradeTitle = new JLabel("⚡ Quick Upgrades");
-        upgradeTitle.setForeground(Color.YELLOW);
-        upgradeTitle.setFont(new Font("Arial", Font.BOLD, 16));
-        upgradeTitle.setAlignmentX(CENTER_ALIGNMENT);
-        panel.add(upgradeTitle);
-        panel.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        addUpgradeButton(panel, "☕ Coffee Quality", "coffee_quality");
-        addUpgradeButton(panel, "🍰 Pastry Variety", "pastry_variety");
-        addUpgradeButton(panel, "⚡ Service Speed", "service_speed");
-        addUpgradeButton(panel, "🎨 Decor", "decor");
-        addUpgradeButton(panel, "📢 Marketing", "marketing");
-
-        panel.add(Box.createRigidArea(new Dimension(0, 15)));
-
-        JButton upgradeAllButton = new JButton("🚀 Upgrade All Possible");
-        upgradeAllButton.setAlignmentX(CENTER_ALIGNMENT);
-        upgradeAllButton.setBackground(new Color(76, 175, 80));
-        upgradeAllButton.setForeground(Color.WHITE);
-        upgradeAllButton.setFocusPainted(false);
-        upgradeAllButton.addActionListener(e -> upgradeAllPossible());
-        panel.add(upgradeAllButton);
-
-        return panel;
-    }
-
-    private void addStat(JPanel panel, String label, String value) {
-        JPanel statPanel = new JPanel(new BorderLayout());
-        statPanel.setOpaque(false);
-        statPanel.setBorder(BorderFactory.createEmptyBorder(6, 5, 6, 5));
-
-        JLabel labelL = new JLabel(label);
-        JLabel valueL = new JLabel(value);
-
-        labelL.setForeground(Color.LIGHT_GRAY);
-        valueL.setForeground(Color.WHITE);
-        labelL.setFont(new Font("Arial", Font.PLAIN, 12));
-        valueL.setFont(new Font("Arial", Font.BOLD, 12));
-
-        statPanel.add(labelL, BorderLayout.WEST);
-        statPanel.add(valueL, BorderLayout.EAST);
-
-        panel.add(statPanel);
-    }
-
-    private void addUpgradeButton(JPanel panel, String name, String upgradeKey) {
-        JPanel buttonPanel = new JPanel(new BorderLayout());
-        buttonPanel.setOpaque(false);
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
-
-        int currentLevel = cafeManager.getUpgrades().get(upgradeKey);
-        int cost = cafeManager.getUpgradeCosts().get(upgradeKey);
-
-        JButton upgradeButton = new JButton("Lv." + currentLevel + " - " + cost + "¢");
-        upgradeButton.setFont(new Font("Arial", Font.BOLD, 11));
-        upgradeButton.setBackground(cafeManager.canAfford(cost) ? new Color(70, 130, 180) : Color.GRAY);
+        JButton upgradeButton = new JButton("⬆️ Quick Upgrade (100¢)");
+        upgradeButton.setFont(new Font("Arial", Font.BOLD, 14));
+        upgradeButton.setBackground(new Color(70, 130, 180));
         upgradeButton.setForeground(Color.WHITE);
-        upgradeButton.setFocusPainted(false);
-        upgradeButton.addActionListener(e -> upgradeItem(upgradeKey, cost, upgradeButton));
+        upgradeButton.addActionListener(e -> quickUpgrade());
 
-        JLabel nameLabel = new JLabel(name);
-        nameLabel.setForeground(Color.WHITE);
-        nameLabel.setFont(new Font("Arial", Font.PLAIN, 11));
+        actionPanel.add(serveButton);
+        actionPanel.add(upgradeButton);
 
-        buttonPanel.add(nameLabel, BorderLayout.WEST);
-        buttonPanel.add(upgradeButton, BorderLayout.EAST);
+        centerPanel.add(actionPanel, BorderLayout.SOUTH);
 
-        panel.add(buttonPanel);
+        // INFO Panel
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setBorder(BorderFactory.createTitledBorder("🏪 Cafe Info"));
+        infoPanel.setBackground(Color.WHITE);
+        infoPanel.setPreferredSize(new Dimension(200, 400));
+
+        addInfoLine(infoPanel, "Level: " + cafeManager.getCafeLevel());
+        addInfoLine(infoPanel, "Games Won: " + cafeManager.getGamesWon());
+        addInfoLine(infoPanel, "Win Rate: " + String.format("%.1f", cafeManager.getWinRate()) + "%");
+        addInfoLine(infoPanel, "Income: " + cafeManager.getHourlyIncome() + "/h");
+
+        // FINAL ASSEMBLY
+        mainPanel.add(headerPanel, BorderLayout.NORTH);
+        mainPanel.add(centerPanel, BorderLayout.CENTER);
+        mainPanel.add(infoPanel, BorderLayout.EAST);
+
+        add(mainPanel);
+        updateCustomerDisplay();
     }
 
-    private void showObjectMenu(CafeObject obj, int x, int y) {
-        JPopupMenu menu = new JPopupMenu();
-
-        JMenuItem upgradeItem = new JMenuItem("⬆️ Upgrade (" + obj.getUpgradeCost() + " coins)");
-        JMenuItem infoItem = new JMenuItem("ℹ️ Info");
-
-        upgradeItem.addActionListener(e -> upgradeObject(obj));
-        infoItem.addActionListener(e -> showObjectInfo(obj));
-
-        menu.add(upgradeItem);
-        menu.add(infoItem);
-
-        menu.show(this, x, y);
+    private void addInfoLine(JPanel panel, String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Arial", Font.PLAIN, 12));
+        label.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        panel.add(label);
     }
 
-    private void showCustomerMenu(Customer customer, int x, int y) {
-        JPopupMenu menu = new JPopupMenu();
-
-        if (customer.isReadyToOrder()) {
-            JMenuItem serveItem = new JMenuItem("☕ Take Order");
-            serveItem.addActionListener(e -> serveCustomer(customer));
-            menu.add(serveItem);
-        }
-
-        JMenuItem infoItem = new JMenuItem("ℹ️ Customer Info");
-        infoItem.addActionListener(e -> showCustomerInfo(customer));
-        menu.add(infoItem);
-
-        menu.show(this, x, y);
+    private void startGameLoop() {
+        gameTimer = new Timer(3000, e -> { // Update every 3 seconds
+            cafeManager.addMoney(10); // Passive income
+            spawnRandomCustomer();
+            updateCustomerDisplay();
+            updateHeader();
+        });
+        gameTimer.start();
     }
 
-    private void upgradeObject(CafeObject obj) {
-        if (cafeManager.canAfford(obj.getUpgradeCost())) {
-            cafeManager.addMoney(-obj.getUpgradeCost());
-            obj.upgrade();
-            updateDisplay();
-            repaint();
-
-            JOptionPane.showMessageDialog(this,
-                    "✅ " + obj.getName() + " upgraded to Level " + obj.getLevel() + "!\n" +
-                            "💰 Income: +" + obj.getIncome() + " coins/hour\n" +
-                            "😊 Satisfaction: +" + obj.getSatisfactionBonus() + "%",
-                    "Upgrade Successful",
-                    JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(this,
-                    "❌ Not enough coins!\nNeed: " + obj.getUpgradeCost() + " coins",
-                    "Insufficient Funds",
-                    JOptionPane.WARNING_MESSAGE);
+    private void spawnRandomCustomer() {
+        Random rand = new Random();
+        if (rand.nextInt(100) < 40) { // 40% chance to spawn customer
+            List<Customer> customers = cafeManager.getCustomersList();
+            if (customers.size() < cafeManager.getMaxCustomers()) {
+                Customer newCustomer = new Customer(0, 0); // Position doesn't matter in this simple version
+                customers.add(newCustomer);
+                customerArea.append("👤 New " + newCustomer.getType() + " customer arrived!\n");
+            }
         }
     }
 
-    private void upgradeItem(String upgradeKey, int cost, JButton button) {
-        if (cafeManager.upgradeItem(upgradeKey)) {
-            updateDisplay();
-            updateButton(button, upgradeKey);
-
-            JOptionPane.showMessageDialog(this,
-                    "✅ " + getUpgradeName(upgradeKey) + " upgraded!\n" +
-                            "💰 Cost: " + cost + " coins\n" +
-                            "⭐ New level: " + cafeManager.getUpgrades().get(upgradeKey),
-                    "Upgrade Successful",
-                    JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(this,
-                    "❌ Not enough coins!\nNeed: " + cost + " coins",
-                    "Insufficient Funds",
-                    JOptionPane.WARNING_MESSAGE);
+    private void serveAllCustomers() {
+        List<Customer> customers = cafeManager.getCustomersList();
+        if (customers.isEmpty()) {
+            customerArea.append("ℹ️ No customers to serve!\n");
+            return;
         }
-    }
 
-    private void upgradeAllPossible() {
-        int upgraded = 0;
-        int totalCost = 0;
+        int totalEarned = 0;
+        int servedCount = 0;
 
-        for (String upgradeKey : cafeManager.getUpgrades().keySet()) {
-            int cost = cafeManager.getUpgradeCosts().get(upgradeKey);
-            if (cafeManager.canAfford(cost)) {
-                if (cafeManager.upgradeItem(upgradeKey)) {
-                    upgraded++;
-                    totalCost += cost;
-                }
+        for (Customer customer : customers) {
+            if (customer.isReadyToOrder()) {
+                int earned = customer.calculateSpending();
+                cafeManager.addMoney(earned);
+                totalEarned += earned;
+                servedCount++;
             }
         }
 
-        if (upgraded > 0) {
-            updateDisplay();
-            JOptionPane.showMessageDialog(this,
-                    "✅ Upgraded " + upgraded + " items!\n" +
-                            "💰 Total cost: " + totalCost + " coins",
-                    "Bulk Upgrade Complete",
-                    JOptionPane.INFORMATION_MESSAGE);
+        // Remove served customers
+        customers.removeIf(customer -> customer.isReadyToOrder());
+
+        if (servedCount > 0) {
+            customerArea.append("✅ Served " + servedCount + " customers! Earned: +" + totalEarned + " coins\n");
+            cafeManager.addMoney(totalEarned);
         } else {
-            JOptionPane.showMessageDialog(this,
-                    "❌ Cannot afford any upgrades!",
-                    "No Upgrades Possible",
-                    JOptionPane.WARNING_MESSAGE);
+            customerArea.append("⏳ Customers are still waiting...\n");
         }
+
+        updateHeader();
+        customerArea.setCaretPosition(customerArea.getDocument().getLength());
     }
 
-    private void serveCustomer(Customer customer) {
-        cafeManager.serveCustomer(customer);
-        updateDisplay();
+    private void quickUpgrade() {
+        int cost = 100;
+        if (cafeManager.canAfford(cost)) {
+            cafeManager.addMoney(-cost);
 
-        JOptionPane.showMessageDialog(this,
-                "✅ Order taken!\n" +
-                        "😊 Customer satisfaction: " + customer.getSatisfaction() + "%\n" +
-                        "💰 Earned: " + (customer.calculateSpending() / 2) + " coins",
-                "Order Taken",
-                JOptionPane.INFORMATION_MESSAGE);
-    }
+            // Simple upgrade - increase satisfaction and income
+            int currentSatisfaction = cafeManager.getSatisfaction();
+            cafeManager.addMoney(50); // Bonus money
+            cafeManager.addMoney(cafeManager.getHourlyIncome()); // Bonus income
 
-    private void showObjectInfo(CafeObject obj) {
-        JOptionPane.showMessageDialog(this,
-                "🏪 " + obj.getName() + "\n\n" +
-                        "⭐ Level: " + obj.getLevel() + "\n" +
-                        "💰 Income: " + obj.getIncome() + " coins/hour\n" +
-                        "⬆️ Next Upgrade: " + obj.getUpgradeCost() + " coins\n" +
-                        "🎯 Satisfaction: +" + obj.getSatisfactionBonus() + "%",
-                "Object Info",
-                JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    private void showCustomerInfo(Customer customer) {
-        JOptionPane.showMessageDialog(this,
-                "👤 Customer Information:\n\n" +
-                        "🎯 Type: " + customer.getType() + "\n" +
-                        "😊 Satisfaction: " + customer.getSatisfaction() + "%\n" +
-                        "⏳ Patience: " + customer.getPatience() + "/" + customer.getMaxPatience() + "\n" +
-                        "💰 Potential: " + customer.calculateSpending() + " coins\n" +
-                        "🎭 State: " + customer.getState(),
-                "Customer Info",
-                JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    private String getUpgradeName(String upgradeKey) {
-        switch (upgradeKey) {
-            case "coffee_quality": return "Coffee Quality";
-            case "pastry_variety": return "Pastry Variety";
-            case "service_speed": return "Service Speed";
-            case "decor": return "Decor";
-            case "marketing": return "Marketing";
-            default: return "Upgrade";
+            customerArea.append("⬆️ Cafe upgraded! Satisfaction +5%, Bonus income received!\n");
+            updateHeader();
+        } else {
+            customerArea.append("❌ Need " + cost + " coins for upgrade!\n");
         }
+        customerArea.setCaretPosition(customerArea.getDocument().getLength());
     }
 
-    private void updateButton(JButton button, String upgradeKey) {
-        int currentLevel = cafeManager.getUpgrades().get(upgradeKey);
-        int cost = cafeManager.getUpgradeCosts().get(upgradeKey);
+    private void updateCustomerDisplay() {
+        List<Customer> customers = cafeManager.getCustomersList();
 
-        button.setText("Lv." + currentLevel + " - " + cost + "¢");
-        button.setBackground(cafeManager.canAfford(cost) ? new Color(70, 130, 180) : Color.GRAY);
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== CURRENT CUSTOMERS ===\n");
+
+        if (customers.isEmpty()) {
+            sb.append("No customers waiting\n");
+        } else {
+            for (int i = 0; i < customers.size(); i++) {
+                Customer c = customers.get(i);
+                String status = c.isReadyToOrder() ? "READY 📝" : "Waiting ⏳";
+                sb.append(String.format("%d. %s - %s (%d%% happy)\n",
+                        i + 1, c.getType(), status, c.getSatisfaction()));
+            }
+        }
+
+        sb.append("=======================\n");
+        sb.append("Click 'Serve All' to earn money!\n\n");
+
+        customerArea.setText(sb.toString());
+    }
+
+    private void updateHeader() {
+        moneyLabel.setText("💰 Money: " + cafeManager.getMoney() + " coins");
+        satisfactionLabel.setText("😊 Satisfaction: " + cafeManager.getSatisfaction() + "%");
+        satisfactionLabel.setForeground(getSatisfactionColor(cafeManager.getSatisfaction()));
     }
 
     private Color getSatisfactionColor(int satisfaction) {
@@ -439,14 +227,10 @@ public class CafeScene extends JFrame {
         return Color.RED;
     }
 
-    private void updateDisplay() {
-        moneyLabel.setText("💰 " + cafeManager.getFormattedMoney() + " coins");
-        satisfactionLabel.setText("😊 " + cafeManager.getSatisfaction() + "%");
-        satisfactionLabel.setForeground(getSatisfactionColor(cafeManager.getSatisfaction()));
-        customersLabel.setText("👥 " + cafeManager.getCustomerCount() + "/" + cafeManager.getMaxCustomers());
-    }
-
     private void goBack() {
+        if (gameTimer != null) {
+            gameTimer.stop();
+        }
         this.dispose();
         mainMeniu.setVisible(true);
         mainMeniu.updateDisplay();

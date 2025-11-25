@@ -235,8 +235,9 @@ public class Customer {
     public void serve() {
         if (state == CustomerState.ORDERING) {
             state = CustomerState.EATING;
-            setEatingTarget();
+            setEatingTarget(); // Asigură-te că are o destinație pentru a mânca
             satisfaction = Math.min(100, satisfaction + 20);
+            patience = maxPatience; // Resetează răbdarea pentru faza de eating
         }
     }
 

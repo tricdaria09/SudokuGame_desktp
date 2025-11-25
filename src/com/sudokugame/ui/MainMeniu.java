@@ -6,8 +6,6 @@ import com.sudokugame.utils.AssetsLoader;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class MainMeniu extends JFrame {
     private CafeManager cafeManager;
@@ -22,51 +20,49 @@ public class MainMeniu extends JFrame {
     private void initializeUI() {
         setTitle("Sudoku Cafe");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(700, 500);
+        setSize(800, 600);
         setLocationRelativeTo(null);
+        setResizable(false);
 
-        JPanel mainPanel = new JPanel(new BorderLayout()) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                Image background = AssetsLoader.getImage("menu_bg");
-                if (background != null) {
-                    g2d.drawImage(background, 0, 0, getWidth(), getHeight(), this);
-                } else {
-                    GradientPaint gradient = new GradientPaint(
-                            0, 0, AssetsLoader.getColor("menu_bg"),
-                            getWidth(), getHeight(), Color.WHITE
-                    );
-                    g2d.setPaint(gradient);
-                    g2d.fillRect(0, 0, getWidth(), getHeight());
-                }
-            }
-        };
+        // Panel principal cu layout explicit
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.setBackground(Color.WHITE); // Fundal alb pentru contrast
 
-        JPanel headerPanel = new JPanel(new FlowLayout());
-        headerPanel.setBackground(AssetsLoader.getColor("header_bg"));
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+        // HEADER - Sus
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 30, 15));
+        headerPanel.setBackground(new Color(70, 130, 180)); // Albastru închis
+        headerPanel.setPreferredSize(new Dimension(800, 80));
 
         moneyLabel = new JLabel("💰 " + cafeManager.getMoney() + " coins");
         cafeLevelLabel = new JLabel("🏪 Level " + cafeManager.getCafeLevel());
 
-        moneyLabel.setFont(AssetsLoader.getFont("header"));
-        cafeLevelLabel.setFont(AssetsLoader.getFont("header"));
-        moneyLabel.setForeground(AssetsLoader.getColor("header_text"));
-        cafeLevelLabel.setForeground(AssetsLoader.getColor("header_text"));
+        moneyLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        cafeLevelLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        moneyLabel.setForeground(Color.WHITE);
+        cafeLevelLabel.setForeground(Color.WHITE);
 
         headerPanel.add(moneyLabel);
         headerPanel.add(cafeLevelLabel);
 
-        JPanel buttonPanel = new JPanel(new GridLayout(5, 1, 8, 8));
-        buttonPanel.setOpaque(false);
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(30, 100, 30, 100));
+        // TITLU - Centru sus
+        JLabel titleLabel = new JLabel("SUDOKU CAFE", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 48));
+        titleLabel.setForeground(new Color(70, 130, 180));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(30, 0, 30, 0));
 
-        JButton playButton = createButton("🎮 PLAY SUDOKU", AssetsLoader.getColor("button_primary"));
-        JButton cafeButton = createButton("🏪 MANAGE CAFE", AssetsLoader.getColor("button_primary"));
-        JButton statsButton = createButton("📊 STATISTICS", AssetsLoader.getColor("button_primary"));
-        JButton settingsButton = createButton("⚙️ SETTINGS", AssetsLoader.getColor("button_primary"));
+        // PANEL pentru BUTOANE - Centru
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(5, 1, 15, 15));
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 150, 20, 150));
+
+        // BUTOANE MARI și VIZIBILE
+        JButton playButton = createButton("🎮 PLAY SUDOKU", new Color(70, 130, 180));
+        JButton cafeButton = createButton("🏪 MANAGE CAFE", new Color(65, 105, 225));
+        JButton statsButton = createButton("📊 STATISTICS", new Color(46, 139, 87));
+        JButton settingsButton = createButton("⚙️ SETTINGS", new Color(169, 169, 169));
         JButton exitButton = createButton("🚪 EXIT", new Color(220, 80, 60));
 
         playButton.addActionListener(e -> showDifficultyMenu());
@@ -81,10 +77,7 @@ public class MainMeniu extends JFrame {
         buttonPanel.add(settingsButton);
         buttonPanel.add(exitButton);
 
-        JLabel titleLabel = new JLabel("SUDOKU CAFE", SwingConstants.CENTER);
-        titleLabel.setFont(AssetsLoader.getFont("title"));
-        titleLabel.setForeground(new Color(70, 130, 180));
-
+        // Asamblare finală
         mainPanel.add(headerPanel, BorderLayout.NORTH);
         mainPanel.add(titleLabel, BorderLayout.CENTER);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -92,21 +85,28 @@ public class MainMeniu extends JFrame {
         add(mainPanel);
     }
 
-    private JButton createButton(String text, Color color) {
+    private JButton createButton(String text, Color backgroundColor) {
         JButton button = new JButton(text);
-        button.setFont(AssetsLoader.getFont("button"));
-        button.setBackground(color);
-        button.setForeground(AssetsLoader.getColor("button_text"));
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
+        // STIL BUTON - FOARTE IMPORTANT!
+        button.setFont(new Font("Arial", Font.BOLD, 20));
+        button.setBackground(backgroundColor);
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(true);
+        button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        button.setPreferredSize(new Dimension(300, 60));
+        button.setMinimumSize(new Dimension(300, 60));
+        button.setMaximumSize(new Dimension(300, 60));
+
+        // Efect hover
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(AssetsLoader.getColor("button_hover"));
+                button.setBackground(backgroundColor.brighter());
+                button.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 2));
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(color);
+                button.setBackground(backgroundColor);
+                button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
             }
         });
 

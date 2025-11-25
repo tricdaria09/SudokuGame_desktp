@@ -399,11 +399,11 @@ public class SudokuGamePanel extends JFrame {
 
         for (int i = 1; i <= 9; i++) {
             JButton numberBtn = new JButton(String.valueOf(i));
-            numberBtn.setFont(new Font("Arial", Font.BOLD, 16));
+            numberBtn.setFont(new Font("Arial", Font.BOLD, 18)); // Mărim fontul
             numberBtn.setBackground(AssetsLoader.getColor("button_primary"));
-            numberBtn.setForeground(AssetsLoader.getColor("button_text"));
+            numberBtn.setForeground(Color.WHITE); // Text alb pentru contrast
             numberBtn.setFocusPainted(false);
-            numberBtn.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+            numberBtn.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0)); // Mai mult padding
             numberBtn.addActionListener(e -> inputNumber(Integer.parseInt(numberBtn.getText())));
             panel.add(numberBtn);
         }
@@ -411,7 +411,7 @@ public class SudokuGamePanel extends JFrame {
         JButton clearBtn = new JButton("Clear");
         clearBtn.setFont(new Font("Arial", Font.BOLD, 14));
         clearBtn.setBackground(Color.RED);
-        clearBtn.setForeground(Color.WHITE);
+        clearBtn.setForeground(Color.WHITE); // Text alb
         clearBtn.addActionListener(e -> inputNumber(0));
         panel.add(clearBtn);
 
@@ -420,11 +420,11 @@ public class SudokuGamePanel extends JFrame {
 
     private JButton createControlButton(String text, Color color, ActionListener action) {
         JButton button = new JButton(text);
-        button.setFont(new Font("Arial", Font.BOLD, 12));
+        button.setFont(new Font("Arial", Font.BOLD, 14)); // Font mai mare
         button.setBackground(color);
-        button.setForeground(Color.WHITE);
+        button.setForeground(Color.WHITE); // Text alb pentru contrast
         button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
+        button.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15)); // Mai mult padding
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.addActionListener(action);
 
