@@ -40,8 +40,8 @@ public class CafeScene extends JFrame {
         headerPanel.setBackground(new Color(30, 70, 120));
         headerPanel.setPreferredSize(new Dimension(800, 80));
 
-        moneyLabel = new JLabel("💰 Money: " + cafeManager.getMoney() + " coins");
-        satisfactionLabel = new JLabel("😊 Satisfaction: " + cafeManager.getSatisfaction() + "%");
+        moneyLabel = new JLabel("$ Money: " + cafeManager.getMoney() + " coins");
+        satisfactionLabel = new JLabel(":D Satisfaction: " + cafeManager.getSatisfaction() + "%");
 
         moneyLabel.setFont(new Font("Arial", Font.BOLD, 18));
         satisfactionLabel.setFont(new Font("Arial", Font.BOLD, 18));
@@ -72,10 +72,10 @@ public class CafeScene extends JFrame {
         JPanel actionPanel = new JPanel(new FlowLayout());
         actionPanel.setBackground(new Color(60, 60, 60));
 
-        JButton serveButton = createButton("☕ SERVE ALL", Color.GREEN);
+        JButton serveButton = createButton(";) SERVE ALL", Color.GREEN);
         serveButton.addActionListener(e -> serveAllCustomers());
 
-        JButton upgradeButton = createButton("⬆️ UPGRADE (100¢)", Color.CYAN);
+        JButton upgradeButton = createButton("️-> UPGRADE (100¢)", Color.CYAN);
         upgradeButton.addActionListener(e -> quickUpgrade());
 
         actionPanel.add(serveButton);
@@ -86,15 +86,15 @@ public class CafeScene extends JFrame {
         // RIGHT SIDE - INFO
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-        infoPanel.setBorder(BorderFactory.createTitledBorder("🏪 CAFE INFO"));
+        infoPanel.setBorder(BorderFactory.createTitledBorder("* CAFE INFO"));
         infoPanel.setBackground(new Color(80, 80, 80));
         infoPanel.setPreferredSize(new Dimension(250, 400));
 
-        addInfoLine(infoPanel, "⭐ Level: " + cafeManager.getCafeLevel());
-        addInfoLine(infoPanel, "🏆 Games Won: " + cafeManager.getGamesWon());
-        addInfoLine(infoPanel, "🎯 Win Rate: " + String.format("%.1f", cafeManager.getWinRate()) + "%");
-        addInfoLine(infoPanel, "💰 Income: " + cafeManager.getHourlyIncome() + "/h");
-        addInfoLine(infoPanel, "👥 Max Customers: " + cafeManager.getMaxCustomers());
+        addInfoLine(infoPanel, "~ Level: " + cafeManager.getCafeLevel());
+        addInfoLine(infoPanel, "~ Games Won: " + cafeManager.getGamesWon());
+        addInfoLine(infoPanel, "~ Win Rate: " + String.format("%.1f", cafeManager.getWinRate()) + "%");
+        addInfoLine(infoPanel, "~ Income: " + cafeManager.getHourlyIncome() + "/h");
+        addInfoLine(infoPanel, "~ Max Customers: " + cafeManager.getMaxCustomers());
 
         // ASAMBLARE FINALĂ
         mainPanel.add(headerPanel, BorderLayout.NORTH);
@@ -157,7 +157,7 @@ public class CafeScene extends JFrame {
             if (customers.size() < cafeManager.getMaxCustomers()) {
                 Customer newCustomer = new Customer(0, 0);
                 customers.add(newCustomer);
-                customerArea.append("🎉 NEW " + newCustomer.getType().toUpperCase() + " CUSTOMER!\n");
+                customerArea.append("! NEW " + newCustomer.getType().toUpperCase() + " CUSTOMER!\n");
                 customerArea.setCaretPosition(customerArea.getDocument().getLength());
             }
         }
@@ -166,7 +166,7 @@ public class CafeScene extends JFrame {
     private void serveAllCustomers() {
         List<Customer> customers = cafeManager.getCustomersList();
         if (customers.isEmpty()) {
-            customerArea.append("❌ NO CUSTOMERS TO SERVE!\n");
+            customerArea.append(":( NO CUSTOMERS TO SERVE!\n");
             return;
         }
 
@@ -185,9 +185,9 @@ public class CafeScene extends JFrame {
 
         if (servedCount > 0) {
             cafeManager.addMoney(totalEarned);
-            customerArea.append("✅ SERVED " + servedCount + " CUSTOMERS! +" + totalEarned + " COINS!\n");
+            customerArea.append(":) SERVED " + servedCount + " CUSTOMERS! +" + totalEarned + " COINS!\n");
         } else {
-            customerArea.append("⏳ CUSTOMERS ARE STILL WAITING...\n");
+            customerArea.append(";| CUSTOMERS ARE STILL WAITING...\n");
         }
 
         updateHeader();
@@ -199,10 +199,10 @@ public class CafeScene extends JFrame {
         if (cafeManager.canAfford(cost)) {
             cafeManager.addMoney(-cost);
             cafeManager.addMoney(50);
-            customerArea.append("⬆️ CAFE UPGRADED! +50 COINS BONUS!\n");
+            customerArea.append("-> CAFE UPGRADED! +50 COINS BONUS!\n");
             updateHeader();
         } else {
-            customerArea.append("❌ NEED " + cost + " COINS FOR UPGRADE!\n");
+            customerArea.append(">:( NEED " + cost + " COINS FOR UPGRADE!\n");
         }
         customerArea.setCaretPosition(customerArea.getDocument().getLength());
     }
@@ -219,7 +219,7 @@ public class CafeScene extends JFrame {
         } else {
             for (int i = 0; i < customers.size(); i++) {
                 Customer c = customers.get(i);
-                String status = c.isReadyToOrder() ? "READY ✅" : "WAITING ⏳";
+                String status = c.isReadyToOrder() ? "READY :)" : "WAITING :|";
                 sb.append(String.format("%d. %s - %s\n", i + 1, c.getType().toUpperCase(), status));
                 sb.append(String.format("   Happiness: %d%%\n", c.getSatisfaction()));
                 sb.append(String.format("   Potential: %d coins\n\n", c.calculateSpending()));
@@ -232,8 +232,8 @@ public class CafeScene extends JFrame {
     }
 
     private void updateHeader() {
-        moneyLabel.setText("💰 Money: " + cafeManager.getMoney() + " coins");
-        satisfactionLabel.setText("😊 Satisfaction: " + cafeManager.getSatisfaction() + "%");
+        moneyLabel.setText("$ Money: " + cafeManager.getMoney() + " coins");
+        satisfactionLabel.setText(":) Satisfaction: " + cafeManager.getSatisfaction() + "%");
     }
 
     private void goBack() {

@@ -59,9 +59,9 @@ public class AssetsLoader {
                 images.put("cafe_scene", new ImageIcon("assets/images/cafe_scene.jpeg").getImage());
             }
 
-            System.out.println("✅ Imagini încărcate cu succes!");
+            System.out.println(":) Imagini încărcate cu succes!");
         } catch (Exception e) {
-            System.out.println("⚠️ Nu s-au putut încărca imaginile: " + e.getMessage());
+            System.out.println(":( Nu s-au putut încărca imaginile: " + e.getMessage());
         }
     }
 

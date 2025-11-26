@@ -35,8 +35,8 @@ public class MainMeniu extends JFrame {
         headerPanel.setBackground(new Color(30, 70, 120));
         headerPanel.setPreferredSize(new Dimension(600, 60)); // MAI MIC
 
-        moneyLabel = new JLabel("💰 " + cafeManager.getMoney() + " coins");
-        cafeLevelLabel = new JLabel("🏪 Level " + cafeManager.getCafeLevel());
+        moneyLabel = new JLabel("$ " + cafeManager.getMoney() + " coins");
+        cafeLevelLabel = new JLabel("~ Level " + cafeManager.getCafeLevel());
 
         moneyLabel.setFont(new Font("Arial", Font.BOLD, 16)); // FONT MAI MIC
         cafeLevelLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -59,11 +59,11 @@ public class MainMeniu extends JFrame {
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 80, 10, 80)); // MARGINI MAI MICI
 
         // BUTOANE CU CULORI PUTERNICE ȘI TEXT NEGRU
-        JButton playButton = createButton("🎮 PLAY SUDOKU", Color.CYAN);
-        JButton cafeButton = createButton("🏪 MANAGE CAFE", Color.GREEN);
-        JButton statsButton = createButton("📊 STATISTICS", Color.MAGENTA);
-        JButton settingsButton = createButton("⚙️ SETTINGS", Color.ORANGE);
-        JButton exitButton = createButton("🚪 EXIT", Color.RED);
+        JButton playButton = createButton("~ PLAY SUDOKU", Color.CYAN);
+        JButton cafeButton = createButton("~ MANAGE CAFE", Color.GREEN);
+        JButton statsButton = createButton("~ STATISTICS", Color.MAGENTA);
+        JButton settingsButton = createButton("~ SETTINGS", Color.ORANGE);
+        JButton exitButton = createButton(":( EXIT", Color.RED);
 
         playButton.addActionListener(e -> showDifficultyMenu());
         cafeButton.addActionListener(e -> openCafeScene());
@@ -169,7 +169,7 @@ public class MainMeniu extends JFrame {
 
     private void showStatistics() {
         JOptionPane.showMessageDialog(this,
-                "📊 Statistics:\n\n" +
+                "% Statistics:\n\n" +
                         "Money: " + cafeManager.getMoney() + " coins\n" +
                         "Cafe Level: " + cafeManager.getCafeLevel() + "\n" +
                         "Games Played: " + cafeManager.getGamesPlayed() + "\n" +
@@ -181,14 +181,14 @@ public class MainMeniu extends JFrame {
 
     private void showSettings() {
         JOptionPane.showMessageDialog(this,
-                "⚙️ Settings\n\n" +
+                "* Settings\n\n" +
                         "No settings available yet.",
                 "Settings",
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void updateDisplay() {
-        moneyLabel.setText("💰 " + cafeManager.getMoney() + " coins");
-        cafeLevelLabel.setText("🏪 Level " + cafeManager.getCafeLevel());
+        moneyLabel.setText("$ " + cafeManager.getMoney() + " coins");
+        cafeLevelLabel.setText("~ Level " + cafeManager.getCafeLevel());
     }
 }

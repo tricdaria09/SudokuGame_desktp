@@ -182,13 +182,13 @@ public class Customer {
 
     private String getStateEmoji() {
         switch (state) {
-            case ENTERING: return "🚶";
-            case WAITING: return "⏳";
-            case ORDERING: return "📝";
-            case EATING: return "☕";
-            case LEAVING: return "👋";
-            case ANGRY: return "😠";
-            default: return "❓";
+            case ENTERING: return "walk";
+            case WAITING: return "time";
+            case ORDERING: return "ok";
+            case EATING: return "coffee";
+            case LEAVING: return "bye";
+            case ANGRY: return ">:(";
+            default: return "?";
         }
     }
 

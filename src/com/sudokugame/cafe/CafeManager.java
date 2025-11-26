@@ -127,7 +127,7 @@ public class CafeManager {
                 int startY = 300 + rand.nextInt(200);
                 Customer newCustomer = new Customer(startX, startY);
                 customersList.add(newCustomer);
-                System.out.println("👥 New customer spawned! Total: " + customersList.size());
+                System.out.println("! New customer spawned! Total: " + customersList.size());
             }
         }
     }
@@ -239,7 +239,7 @@ public class CafeManager {
             totalIncome += spending;
 
             // Adaugă un mesaj de feedback
-            System.out.println("✅ Customer served! Earned: " + spending + " coins");
+            System.out.println(":) Customer served! Earned: " + spending + " coins");
         }
     }
 
